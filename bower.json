@@ -1,0 +1,26 @@
+{
+  "name": "freeants-js",
+  "version": "0.0.0",
+  "authors": [
+    "DWORD s.r.l."
+  ],
+  "description": "FreeAnts JS SDK",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/*",
+    "!dist/*.*",
+    "!examples/**/*.*",
+    "!README.md",
+	  "!LICENSE"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.3",
+    "signalr": "^2.2.0"
+  },
+  "devDependencies": {   
+  },
+  "resolutions": {   
+  }
+}
