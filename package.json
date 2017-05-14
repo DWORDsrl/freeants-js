@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/FreeAnts.min.js",
   "scripts": {
-    "prepublish": "webpack -p; webpack --debug;"
+    "prepublish": "webpack --debug"
   },
   "keywords": [],
   "author": "Carmelo Campione - DWORD s.r.l.",
