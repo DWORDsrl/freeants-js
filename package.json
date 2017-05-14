@@ -1,0 +1,20 @@
+{
+  "name": "freeants-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/FreeAnts.min.js",
+  "scripts": {
+    "prepublish": "webpack -p; webpack --debug;"
+  },
+  "keywords": [],
+  "author": "Carmelo Campione - DWORD s.r.l.",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^2.0.3",
+    "tslint": "^5.2.0",
+    "tslint-loader": "^3.5.3",
+    "typescript": "^2.3.2",
+    "webpack": "^2.5.1",
+    "yargs" :"^8.0.1"
+  }
+}
