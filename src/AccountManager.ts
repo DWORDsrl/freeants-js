@@ -1,3 +1,5 @@
+import * as $ from "jquery";
+
 export class AccountManager {
     
     private static _appName: string = "";
