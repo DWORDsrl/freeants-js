@@ -1,13 +1,953 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Foo</title>
-  </head>
-  <body>
-    <h1>Foo</h1>
+
+<html lang="it" ng-app="thingsAngular">
+<head>
+    <meta charset="utf-8" />
+
+    <title>Things Console with FreeAnts Angular SDK</title>
+
+    <!-- Base Libraries -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
+    <script src="bower_components/signalr/jquery.signalR.min.js"></script>
+    <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
+    
+     <!-- Must be the First -->    
+    <script src="bower_components/freeants-angular/dist/freeants-angular.debug.js"></script>
+
+    <!-- New sdk -->
     <script src="../dist/FreeAnts.js"></script>
+
+<!--
+    textarea {
+        height: 100%;
+        width: 100%;
+        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+        box-sizing: border-box;         /* Opera/IE 8+ */
+    }
+-->
+
+    <!-- Layout like pinterest 1 -->
+    <style>
+
+        body {
+            background: url(http://subtlepatterns.com/patterns/scribble_light.png) ;
+        }
+
+        #wrapper {
+            width: 90%;
+            max-width: 1100px;
+            min-width: 800px;
+            margin: 50px auto;
+        }
+
+        #columns {
+            -webkit-column-count: 3;
+            -webkit-column-gap: 10px;
+            -webkit-column-fill: auto;
+            -moz-column-count: 3;
+            -moz-column-gap: 10px;
+            -moz-column-fill: auto;
+            column-count: 3;
+            column-gap: 15px;
+            column-fill: auto;
+        }
+
+        .pin {
+            display: inline-block;
+            background: #FEFEFE;
+            border: 2px solid #FAFAFA;
+            box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+            margin: 0 2px 15px;
+            -webkit-column-break-inside: avoid;
+            -moz-column-break-inside: avoid;
+            column-break-inside: avoid;
+            padding: 15px;
+            padding-bottom: 5px;
+            background: -webkit-linear-gradient(45deg, #FFF, #F9F9F9);
+            opacity: 1;
+            
+            -webkit-transition: all .2s ease;
+            -moz-transition: all .2s ease;
+            -o-transition: all .2s ease;
+            transition: all .2s ease;
+        }
+
+        .pin img {
+            width: 100%;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 5px;
+        }
+
+        .pin p {
+            font: 12px/18px Arial, sans-serif;
+            color: #333;
+            margin: 0;            
+        }
+
+        @media (min-width: 960px) {
+            #columns {
+                -webkit-column-count: 4;
+                -moz-column-count: 4;
+                column-count: 4;
+            }
+        }
+
+        @media (min-width: 1100px) {
+            #columns {
+                -webkit-column-count:4;
+                -moz-column-count: 4;
+                column-count: 4;
+            }
+        }
+
+        #columns:hover .pin:not(:hover) {
+            opacity: 0.4;
+        }
+
+    </style>
+
+    <!-- Layout like pinterest 2 -->
+    <style>
+
+        .wrapper {
+            width: 95%;
+            margin: 3em auto;
+        }
+
+        .masonry {
+            margin: 1.5em 0;
+            padding: 0;
+            -moz-column-gap: 1.5em;
+            -webkit-column-gap: 1.5em;
+            column-gap: 1.5em;
+            font-size: .85em;
+        }
+
+        .item {
+            display: inline-block;
+            background: #fff;
+            padding: 1em;
+            margin: 0 0 1.5em;
+            width: 100%;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-shadow: 2px 2px 4px 0 #ccc;
+        }
+
+        @media only screen and (min-width: 400px) {
+            .masonry {
+                -moz-column-count: 2;
+                -webkit-column-count: 2;
+                column-count: 2;
+            }
+        }
+
+        @media only screen and (min-width: 700px) {
+            .masonry {
+                -moz-column-count: 3;
+                -webkit-column-count: 3;
+                column-count: 3;
+            }
+        }
+
+        @media only screen and (min-width: 900px) {
+            .masonry {
+                -moz-column-count: 4;
+                -webkit-column-count: 4;
+                column-count: 4;
+            }
+        }
+
+        @media only screen and (min-width: 1100px) {
+            .masonry {
+                -moz-column-count: 2;
+                -webkit-column-count: 2;
+                column-count: 2;
+            }
+        }
+
+        @media only screen and (min-width: 1280px) {
+            .wrapper {
+                width: 1260px;
+            }
+        }
+
+    </style>
+
     <script>
-      var dummy = new FreeAnts.TestClass('Hello World');
-      alert(dummy.name);
+        'use strict'
+
+        var app = angular.module('thingsAngular', ['freeants', 'infinite-scroll']);
+
+        /* ng-infinite-scroll - v1.0.0 - 2013-02-23 */
+        // you might call this after your module initalization
+        angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 500);
+
+        app.constant("path", {
+            //server: "http://localhost:40592/",
+            //api: "http://localhost:40592/api"
+
+            server: "http://titaggocoreportal.azurewebsites.net/",
+            api: "http://titaggocoreportal.azurewebsites.net/api"
+
+            //server: "http://titaggocoreportal-slot1.azurewebsites.net/",
+            //api: "http://titaggocoreportal-slot1.azurewebsites.net/api"
+        });
+
+        app.config(['accountManagerProvider',
+        function (accountManagerProvider) {
+
+            accountManagerProvider.setAppName("freeants-angular-sample", "AccessTokenOrDWApiKey");
+            accountManagerProvider.readLoginData();           
+
+        }]);
+
+        FreeAnts.AccountManager.appName = "freeants-angular-sample";
+        FreeAnts.AccountManager.readLoginData();
+
     </script>
+        
+    <script>
+
+        'use strict'
+
+        app.factory('mainNotifier', ['$rootScope', 'notifierConnector', 'accountManager', 'path', '$timeout',
+        function ($rootScope, notifierConnector, accountManager, path, $timeout) {
+
+            function connectionStatus(change) {
+                switch (change.newState) {
+                    case notifierConnector.connected:
+                        {
+                            $rootScope.notifierConnectionStatus = notifierConnector.connected;
+                            break;
+                        }
+                    case notifierConnector.connecting:
+                        {
+                            $rootScope.notifierConnectionStatus = notifierConnector.connecting;
+                            break;
+                        }
+                    case notifierConnector.reconnecting:
+                        {
+                            $rootScope.notifierConnectionStatus = notifierConnector.reconnecting;
+                            break;
+                        }
+                    case notifierConnector.disconnected:
+                        {
+                            $rootScope.notifierConnectionStatus = notifierConnector.disconnected;
+                            break;
+                        }
+                    default:
+                        {
+                            $rootScope.notifierConnectionStatus = notifierConnector.disconnected;
+                            break;
+                        }
+                }
+                //TODO: Questo timeout serve come workarround per aggiornare lo stato di connessione di signalR.
+                //      Togliendolo lo stato di connessione non si aggiorna
+                $timeout(null, 1);
+            }
+            function onReconnected() { }
+
+            notifierConnector.init(connectionStatus, onReconnected);
+
+            function subscribeSuccess() {
+                $rootScope.lastMsg = "Logged in";
+            }
+            function subscribeFail() {
+
+                $rootScope.lastMsg = "SignalR Subscribe Failed";                
+            }
+
+            notifierConnector.setHook('onCreateThing', function (thing) {
+
+                //INFO: Inserire qui il codice utile
+
+                //TODO: Questo timeout serve come workarround per aggiornare lo stato di connessione di signalR.
+                //      Togliendolo lo stato di connessione non si aggiorna
+                $timeout(null, 1);
+            });
+            notifierConnector.setHook('onDeleteThing', function (thingId) {
+
+                //INFO: Inserire qui il codice utile
+
+                //TODO: Questo timeout serve come workarround per aggiornare lo stato di connessione di signalR.
+                //      Togliendolo lo stato di connessione non si aggiorna
+                $timeout(null, 1);
+            });
+            notifierConnector.setHook('onCreateChildThingId', function (parent, child, kind) {
+
+                //INFO: Inserire qui il codice utile
+
+                //TODO: Questo timeout serve come workarround per aggiornare lo stato di connessione di signalR.
+                //      Togliendolo lo stato di connessione non si aggiorna
+                $timeout(null, 1);
+            });
+            notifierConnector.setHook('onUpdateThingValue', function (thingId, value) {
+
+                //INFO: Inserire qui il codice utile
+
+                //TODO: Questo timeout serve come workarround per aggiornare lo stato di connessione di signalR.
+                //      Togliendolo lo stato di connessione non si aggiorna
+                $timeout(null, 1);
+            });
+            notifierConnector.setHook('onDeleteChildThingId', function (parent, child, kind) {
+
+                //INFO: Inserire qui il codice utile
+
+                //TODO: Questo timeout serve come workarround per aggiornare lo stato di connessione di signalR.
+                //      Togliendolo lo stato di connessione non si aggiorna
+                $timeout(null, 1);
+            });
+
+            var extport = {
+                subscribe: function () {
+                    notifierConnector.subscribe(path.server + "signalr", "Bearer", accountManager.getAccessToken, subscribeSuccess, subscribeFail);
+                },
+                unsubscribe: function () {
+                    notifierConnector.unsubscribe();
+                },
+                connectionStatus: notifierConnector.disconnected
+            }
+
+            return extport;
+        }])
+
+        app.run(['$rootScope', 'accountManagerService', 'mainNotifier', 
+        function ($rootScope, accountManagerService, mainNotifier) {
+
+            $rootScope.lastMsg = "Ok";
+            $rootScope.loggedIn = false;
+            $rootScope.notifierConnectionStatus = mainNotifier.connectionStatus;
+
+            if (accountManagerService.checkAccessToken() == true) {
+                $rootScope.loggedIn = true;
+
+                mainNotifier.subscribe();
+            }
+
+        }]);
+
+        app.controller('LoginController', ['$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
+        function LoginController($rootScope, $scope, accountManagerService, mainNotifier) {
+
+            $scope.modelLogin = {
+                grant_type: "password",
+                username: "",
+                password: ""
+            }
+            
+            $scope.login = function() {
+                accountManagerService.login($scope.modelLogin, true)
+                .then(function (result) {
+                    if (result.status) {
+                        $rootScope.loggedIn = true;
+                        $rootScope.lastMsg = "Logged in";
+                        mainNotifier.subscribe();                        
+                    }
+                    else {
+                        $rootScope.lastMsg = result.data;
+                    }
+                },
+                function (data) {
+                    $rootScope.lastMsg = result.data;
+                });
+            }
+        }]);
+
+         app.controller('LoggedInUserInfosController', ['$rootScope', '$scope', 'accountDataContext', 
+        function LoggedInUserInfosController($rootScope, $scope, accountDataContext) {
+            $scope.userIfos = "";
+            accountDataContext.getUserInfo()
+            .then(function(data) {
+                $scope.userInfos = data;
+            }, function(data) {
+                $rootScope.lastMsg = data;
+            });
+        }]);
+
+        app.controller('LogoutController', ['$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
+        function LogoutController($rootScope, $scope, accountManagerService, mainNotifier) {
+            
+            $scope.logout = function() {
+                // TODO: Fix unsubscribe fail
+                mainNotifier.unsubscribe();
+
+                accountManagerService.logout()
+                .then(function (data) {
+                    $rootScope.loggedIn = false;
+                    $rootScope.lastMsg = "Ok";
+                    if (data.status == false) {
+                        $rootScope.lastMsg = data;
+                    }
+                })
+            }
+        }]);
+
+        app.controller('ThingsPositionTestController', ['$q', '$scope', 'ThingModel', 'thingsManager', 'thingsDataContext',
+        function ThingsPositionTestController($q, $scope, ThingModel, thingsManager, thingsDataContext) {
+
+            $scope.mainThing = new ThingModel({});
+            
+            var getThingsParams = {
+
+                //parentThingId: null, ovverrided
+                filter: "",
+                top: 10,
+                //skip: 0, ovverrided
+                orderBy: '',
+                valueFilter: null
+            };
+
+            var abortHttpCalls = $q.defer();
+            $scope.disableThingsScroll = true;
+            $scope.getMoreThings = function() {
+
+                if ($scope.disableThingsScroll)
+                    return;
+                $scope.disableThingsScroll = true;
+                thingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, abortHttpCalls)
+                .then(function(data) {                    
+                    $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
+                }, function(data) {
+
+                });
+            }
+           
+            $scope.up = function(index) {
+
+                if (index == 0)
+                    return;
+
+                var tempThing = $scope.mainThing.children[index];
+                $scope.mainThing.children[index] = $scope.mainThing.children[index - 1];
+                $scope.mainThing.children[index - 1] = tempThing;
+
+                var positions = [];
+                for (var i = 0; i <= index; i++) {                    
+                    var thing = $scope.mainThing.children[i];
+                    thing.pos = i;
+                    positions.push({parentId: null, childId: thing.id, pos: thing.pos});
+                }
+                thingsDataContext.putThingsPositions(positions)
+                .then(function(data) {
+                    alert("Update pos ok");
+                },
+                function(data) {
+
+                });
+            }
+
+            $scope.down = function(index) {
+
+                if (index == $scope.mainThing.children.length - 1)
+                    return;
+
+                var tempThing = $scope.mainThing.children[index];
+                $scope.mainThing.children[index] = $scope.mainThing.children[index + 1];
+                $scope.mainThing.children[index + 1] = tempThing;
+
+                var positions = [];
+                for (var i = 0; i <= index + 1; i++) {                    
+                    var thing = $scope.mainThing.children[i];
+                    thing.pos = i;
+                    positions.push({parentId: null, childId: thing.id, pos: thing.pos});
+                }
+                thingsDataContext.putThingsPositions(positions)
+                .then(function(data) {
+                    alert("Update pos ok");
+                },
+                function(data) {
+
+                });
+            }
+
+            $scope.putPositions = function() {
+
+                if ($scope.mainThing.children.length == 0)
+                    return;
+
+                var positions = [];
+                for (var i = 0; i < $scope.mainThing.children.length; i++) {                    
+                    var thing = $scope.mainThing.children[i];
+                    thing.pos = i;
+                    positions.push({parentId: null, childId: thing.id, pos: thing.pos});
+                }
+                thingsDataContext.putThingsPositions(positions)
+                .then(function(data) {
+                    alert("Update pos ok");
+                },
+                function(data) {
+
+                });
+            }
+
+            $scope.getMoreThings();
+        }]);
+
+        app.controller('UsersListController', ['$q', '$scope', 'UsersManager', 
+        function UsersListController($q, $scope, UsersManager) {
+
+            var usersManager = new UsersManager();
+            $scope.users = usersManager.users;
+            
+            var abortHttpCalls = $q.defer();
+            $scope.disableUsersScroll = false;
+            $scope.getMoreUsers = function() {
+                if ($scope.disableUsersScroll)
+                    return;
+
+                $scope.disableUserScroll = true;
+                usersManager.getMoreUsers(abortHttpCalls)
+                .then(function(data) {
+                    $scope.disableUsersScroll = (usersManager.getUsersTotalItems() == usersManager.getUsersItems());
+                });
+            }
+        }]);
+
+        app.controller('SearchThingController', ['$q', '$scope', 'ThingModel', 'thingsManager', 
+        function SearchThingController($q, $scope, ThingModel, thingsManager) {
+
+            $scope.searchQuery = "";
+            $scope.mainThing = new ThingModel({});
+            
+            var getThingsParams = {
+
+                //parentThingId: null, ovverrided
+                filter: "contains(Name,'" + $scope.searchQuery + "') or contains(Id,'" + $scope.searchQuery + "') or contains(Kind,'" + $scope.searchQuery + "')",
+                top: 10,
+                //skip: 0, ovverrided
+                orderBy: null,
+                valueFilter: null
+            };
+
+            $scope.searchThing = function() {
+                
+                $scope.disableThingsScroll = true;                
+
+                thingsManager.collapseThing($scope.mainThing, abortHttpCalls);
+
+                if (!$scope.searchQuery)
+                    return;
+
+                abortHttpCalls = $q.defer();
+
+                getThingsParams.filter = "contains(Name,'" + $scope.searchQuery + "') or contains(Id,'" + $scope.searchQuery + "') or contains(Kind,'" + $scope.searchQuery + "')";
+
+                thingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, abortHttpCalls)
+                .then(function() {
+                    $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
+                }, function(data) {
+
+                });
+            }
+
+            var abortHttpCalls = $q.defer();
+            $scope.disableThingsScroll = false;              
+            $scope.getMoreThings = function() {
+
+                if ($scope.disableThingsScroll)
+                    return;
+                $scope.disableThingsScroll = true;
+                thingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, abortHttpCalls)
+                .then(function() {
+                    $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
+                }, function(data) {
+
+                });
+            }
+
+            $scope.$watch('searchQuery', function (newSearchValue, oldSearchValue) {
+                $scope.searchThing();
+            },true);
+
+        }]);
+
+        app.factory("BookRightsAndClaims", ['thingClaims',
+        function BookRightsAndClaims(thingClaims) {
+            return {
+                PublicReadClaims: thingClaims.ThingUserChangeClaimsNoClaims,
+                PublicChangeClaims: thingClaims.ThingUserChangeClaimsNoClaims,
+                EveryoneReadClaims: thingClaims.ThingUserReadClaimsNoClaims,
+                EveryoneChangeClaims: thingClaims.ThingUserChangeClaimsNoClaims,
+                // Creator
+                CreatorUserReadClaims: thingClaims.ThingUserReadClaimsAllClaims,
+                //Anche lo User che lo ha costruito non può cambiare il Kind
+                CreatorUserChangeClaims: thingClaims.ThingUserChangeClaimsAllClaims & ~thingClaims.ThingUserChangeClaimsCanChangeKind,
+            }
+        }]);        
+
+        app.factory('BooksManager', ['ThingModel', 'BookRightsAndClaims', 'ApplicationThingsManager',
+        function (ThingModel, BookRightsAndClaims, ApplicationThingsManager) {
+        
+            function BooksManager(usersManager) {
+
+                var bookKind = "B1996416-43C2-4193-938B-0275C27479AF";
+
+                var mainApp = new ThingModel({ kind: bookKind });
+
+                var applicationThingsManager = new ApplicationThingsManager(mainApp, bookKind, BookRightsAndClaims, usersManager);
+                
+                return applicationThingsManager;
+            }
+
+            return BooksManager;
+        }]);
+
+        // Define the `BooksManagerController` controller
+        app.controller('BooksManagerController', ['$q', '$scope', 'UsersManager', 'BooksManager', 
+        function BooksManagerController($q, $scope, UsersManager, BooksManager) {
+
+            var usersManager = new UsersManager();
+
+            var booksManager = new BooksManager(usersManager);
+
+            var abortHttpCalls = $q.defer();
+            
+            $scope.books = booksManager.things;
+            
+            $scope.disableBooksScroll = true;
+            $scope.getMoreBooks = function() {
+                if ($scope.disableBooksScroll)
+                    return;
+                $scope.disableBooksScroll = true;
+                booksManager.getMoreThings(abortHttpCalls)
+                .then(function(data) {
+                    $scope.disableBooksScroll = (booksManager.getThingsTotalItems() == $scope.books.length);                    
+                });
+            }           
+        }]);
+                
+        app.controller('PushNotificationCtrl', ['$rootScope', '$scope', 'pushNotificationsDataContext', 
+        function PushNotificationCtrl($rootScope, $scope, pushNotificationsDataContext) {
+
+            $scope.checkboxLanguage = {
+                it: false,
+                en: false,
+                de: false
+            };
+            $scope.checkboxPlatforms = {
+                gcm: false,
+                apns: false
+            };
+            
+            $scope.image = "";
+            $scope.extraInfo = "";
+            
+            //ThingId Azure PushNotificationHub
+            $scope.hubId = "1735b2e9-c8d2-463a-a3ae-750e92561a7c";
+            
+            //Local Messages
+            $scope.localMessages = [];
+            $scope.addRemoveMessage = function(value){
+                
+                var indexFound;
+               
+                for(var i=0; i < $scope.localMessages.length; i++){
+                    if($scope.localMessages[i].culture == value)
+                        indexFound = i;
+                }
+                
+                if(indexFound != undefined)
+                   $scope.localMessages.splice(indexFound, 1);     
+                else 
+                    $scope.localMessages.push({title: "", message: "", culture: value});     
+            };
+            
+            //Platforms
+            $scope.platforms = [];
+            $scope.addRemovePlatform = function(value){
+                
+                var indexFound;
+               
+                for(var i=0; i < $scope.platforms.length; i++) {
+                    if($scope.platforms[i] == value)
+                        indexFound = i;
+                }
+                
+                if(indexFound != undefined)
+                   $scope.platforms.splice(indexFound, 1);     
+                else 
+                    $scope.platforms.push(value);     
+            };
+            
+            //Send Push Notification
+            $scope.SendPushNotification = function(){
+                $rootScope.pushModel = {
+                    pns: $scope.platforms,
+                    thingId: $scope.hubId,
+                    localMessages : $scope.localMessages,
+                    image: $scope.image,
+                    extraInfo: $scope.extraInfo
+                };
+                
+                pushNotificationsDataContext.push($rootScope.pushModel)
+                .then(function(data){
+                    console.log(data);
+                }, function(error){
+                    console.log(error);
+                })
+            }
+            
+            $scope.SavePushNotification = function(){
+                $rootScope.pushModel = {
+                    pns: $scope.platforms,
+                    thingId: $scope.hubId,
+                    localMessages : $scope.localMessages,
+                    image: $scope.image,
+                    extraInfo: $scope.extraInfo
+                };              
+            }
+        }]);
+
+        app.controller('SchedulerCtrl', ['$rootScope', '$scope', 'schedulerDataContext', 
+        function SchedulerCtrl($rootScope, $scope, schedulerDataContext) {
+            
+            $scope.modelScheduling = {};
+            $scope.modelScheduling.tags = {
+                id: ""
+            }
+            $scope.modelScheduling.first = "";
+            $scope.modelScheduling.thingId = "5ec29397-72fc-4437-bc04-0f18910a731d";
+            $scope.modelScheduling.url = "http://titaggocoreportal.azurewebsites.net/api/PushNotificationsPushATrigger?DWApiKey=dfa1e8b4-a7dc-4bdd-99cb-7c08a4a75b50";
+            $scope.convertPostData = function(){
+                var modJson = {
+                    thingId: $rootScope.pushModel.thingId,
+                    pns: angular.toJson($rootScope.pushModel.pns),
+                    localMessages: angular.toJson($rootScope.pushModel.localMessages),
+                    image: $rootScope.pushModel.image,
+                    extraInfo: $rootScope.pushModel.extraInfo
+                };
+               
+                $scope.modelScheduling.postData = angular.toJson(modJson);
+            }
+            
+            $scope.schedule = function(){
+                schedulerDataContext.schedule($scope.modelScheduling)
+                .then(function(data){
+                    console.log(data);
+                }, function(error){
+                    console.log(error);
+                })
+            }
+        }]);
+
+    </script>
+
+</head>
+<body>
+
+	<div>
+		<b> Bravo! </b>
+	</div>
+
+    <div>
+        <b> {{ lastMsg }} </b>
+        <b> {{ notifierConnectionStatus }} </b>
+    </div>
+
+    <div ng-if="loggedIn == false" ng-controller="LoginController">
+        <input type="text"     ng-model="modelLogin.username" placeholder="email" />
+        <input type="password" ng-model="modelLogin.password" placeholder="password" />
+        <button ng-click="login()">
+            login
+        </button>
+    </div>
+
+    <div ng-if="loggedIn == true" ng-controller="LogoutController">
+        <button ng-click="logout()">
+            logout
+        </button>
+    </div>    
+
+    <div ng-if="loggedIn == true" ng-controller="LoggedInUserInfosController">
+        <b> {{userInfos}} </b>
+    </div>
+
+    <div ng-if="loggedIn == true" ng-controller="ThingsPositionTestController">
+        <div infinite-scroll='getMoreThings()' infinite-scroll-disabled='disableThingsScroll' infinite-scroll-use-document-bottom="true">
+            <div ng-repeat="thing in mainThing.children">
+                <button ng-click="up($index)">
+                    Up
+                </button>
+                <button ng-click="down($index)">
+                    down
+                </button>
+
+                {{$index}}
+
+                <label>
+                    Pos:
+                    <input type="text" name="pos" ng-model="thing.pos">
+                </label>
+                    {{thing.name}}
+            </div>
+        </div>
+        <button ng-click="putPositions()">
+            update positions
+        </button>
+    </div>
+
+    <div ng-if="loggedIn == true" ng-controller="UsersListController" > 
+        <button ng-click="getMoreUsers()">
+            getMoreUsers
+        </button>
+        <div id="wrapper" infinite-scroll='getMoreUsers()' infinite-scroll-disabled='disableUsersScroll' infinite-scroll-use-document-bottom="true">
+            <div id="columns">    
+                <div class="pin" ng-repeat="user in users">
+                    <span>{{user.id}}</span>
+                    </br>
+                    <span>{{user.name}}</span>
+                    <span>{{user.surname}}</span>
+                    </br>
+                    <span>{{user.username}}</span>
+                    </br>
+                    <span>{{user.masterApiKey}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="loggedIn == true" ng-controller="SearchThingController" > 
+        <input type="text" ng-model="searchQuery" placeholder="search" />
+        <button ng-click="searchThing()">
+            Search
+        </button>
+
+        <div class="wrapper">
+            <div id="masonry" class="masonry" infinite-scroll='getMoreThings()' infinite-scroll-disabled='disableThingsScroll' infinite-scroll-use-document-bottom="true">
+                <div class="item" ng-repeat="thing in mainThing.children">
+                    <p>{{thing.id}}</p>
+                    <strong>{{thing.name}}</strong>
+                    <p>{{thing.kind}}</p>
+
+                    <img ng-if="thing.value.image" style="max-height:50%; max-width:50%;" ng-src="{{thing.value.image}}" />
+
+                    <textarea rows="5" >{{thing.value}}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div ng-if="loggedIn == true" ng-controller="BooksManagerController" > 
+        <button ng-click="getMoreBooks()">
+            getMoreBooks
+        </button>
+
+        <div id="wrapper" infinite-scroll='getMoreBooks()' infinite-scroll-disabled='disableBooksScroll' infinite-scroll-use-document-bottom="true">
+            <div id="columns">    
+                <div class="pin" ng-repeat="book in books">
+                    <span>{{book.id}}</span> - 
+                    <span>{{book.name}}</span>
+                    <!--
+                    <span>{{book.value}}</span>
+                    -->
+
+                    <img ng-src="{{book.value.image}}" />
+
+                    <ul>
+                        <li ng-repeat="comment in book.children">
+                            <span>{{comment.value.text}}</span>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div ng-if="loggedIn == true" ng-controller="PushNotificationCtrl">
+        <h3>Test send</h3>
+        <input type="text" ng-model="hubId" placeholder="ThingHub ID">
+        <br>
+          <p>Platforms:</p><hr>
+        <label>Google:
+            <input type="checkbox" ng-model="checkboxPlatforms.gcm" ng-change="addRemovePlatform('gcm')">
+        </label>
+        <label>Apple:
+            <input type="checkbox" ng-model="checkboxPlatforms.apns" ng-change="addRemovePlatform('apns')">
+        </label><br><br>
+        <p>Languages:</p><hr>
+        <label>IT:
+            <input type="checkbox" ng-model="checkboxLanguage.it" ng-change="addRemoveMessage('IT')">
+        </label>
+        <label>EN:
+            <input type="checkbox" ng-model="checkboxLanguage.en" ng-change="addRemoveMessage('EN')">
+        </label>
+        <label>DE:
+            <input type="checkbox" ng-model="checkboxLanguage.de" ng-change="addRemoveMessage('DE')">
+        </label><br/><br />
+        <div ng-repeat="localMessage in localMessages">
+            <p>Add message for {{localMessage.culture}}</p>
+            <input type="text" ng-model="localMessage.culture" hidden/>
+            <input type="text" placeholder="Title {{localMessage.culture}}" ng-model="localMessage.title" />
+            <input type="text" placeholder="Message {{localMessage.culture}}" ng-model="localMessage.message" />
+            <hr>
+        </div>
+        <br>
+          <input type="text" ng-model="image" placeholder="Image URL">
+          <input type="text" ng-model="extraInfo" placeholder="ExtraInfo URL parameters"><br>
+
+        <button ng-click="SendPushNotification()">Send</button><br>
+        <button ng-click="SavePushNotification()">Save</button><br>
+
+        <code>
+            {{platforms}}
+        </code>
+        <br>
+        <code>
+            {{localMessages}}
+        </code>
+    </div>
+
+    <div ng-if="loggedIn == true" ng-controller="SchedulerCtrl">
+        <h3>Test Scheduler</h3>
+        <label>Enable
+          <input type="checkbox" ng-model="modelScheduling.status" ng-change="convertPostData()">
+        </label>
+        <input type="text" ng-model="modelScheduling.thingId" placeholder="Scheduler ID">
+        <br>  
+          <p>When:</p>
+            <select ng-model="modelScheduling.timeValue">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+          </select>
+          <select ng-model="modelScheduling.timeQuantity">
+              <option value="Minute">Minute</option>
+              <option value="Hour">Hour</option>
+              <option value="Day">Day</option>
+              <option value="Mouth">Mouth</option>
+             <option value="Year">Year</option>
+          </select>
+           <input type="text" ng-model="modelScheduling.first" placeholder="Start at">
+            <label>How many time execute?
+                <select ng-model="modelScheduling.count">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                </select>   
+            </label>
+            <label>How many time retries if request fail?
+                <select ng-model="modelScheduling.retires">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                </select>   
+            </label>
+          <input type="text" ng-model="modelScheduling.tags.id" placeholder="tagId"><br>
+          <button ng-click="schedule()">Schedule</button><br>
+          <hr>
+        <code>
+            {{modelScheduling}}
+        </code>
+    </div>
+</body>
 </html>

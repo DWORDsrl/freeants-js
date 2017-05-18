@@ -1,7 +1,8 @@
-import { SubClass } from './SubClass';
+import { SubClass } from "./SubClass";
+import {AccountManager } from "./AccountManager";
 
 export class TestClass {
-  private _name = '';
+  private _name = "";
 
   constructor(name: string) {
     this._name = name;
@@ -16,6 +17,7 @@ export class TestClass {
   }
 
   createNewTestObject() {
+    var dummu = new AccountManager();
     return new SubClass(this);
   }
 }

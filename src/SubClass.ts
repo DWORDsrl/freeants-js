@@ -1,4 +1,4 @@
-import { TestClass } from './TestClass';
+import { TestClass } from "./TestClass";
 
 export class SubClass {
   private _testclass: TestClass;

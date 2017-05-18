@@ -1,0 +1,16 @@
+{
+  "name": "freeants-js-test",
+  "version": "0.0.1",
+  "authors": [
+    "DWORD s.r.l."
+  ],
+  "description": "FreeAnts JS SDK - Test",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {
+    "freeants-angular": "latest",
+    "ngInfiniteScroll" : "^1.0.0"
+  },
+  "devDependencies": {}
+}
