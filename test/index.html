@@ -207,6 +207,15 @@
 
         }]);
 
+        // New SDK
+
+        let endPointAddress = {
+            server: "http://titaggocoreportal.azurewebsites.net/",
+            api: "http://titaggocoreportal.azurewebsites.net/api"
+        }
+
+        FreeAnts.AccountDataContext.init(endPointAddress);
+
         FreeAnts.AccountManager.appName = "freeants-angular-sample";
         FreeAnts.AccountManager.readLoginData();
 
@@ -355,6 +364,13 @@
                 },
                 function (data) {
                     $rootScope.lastMsg = result.data;
+                });
+            }
+
+            $scope.login1 = function() {         
+                FreeAnts.AccountDataContext.login($scope.modelLogin)
+                .then(function(data){
+                    alert("Ok");
                 });
             }
         }]);
@@ -753,7 +769,7 @@
     <div ng-if="loggedIn == false" ng-controller="LoginController">
         <input type="text"     ng-model="modelLogin.username" placeholder="email" />
         <input type="password" ng-model="modelLogin.password" placeholder="password" />
-        <button ng-click="login()">
+        <button ng-click="login1()">
             login
         </button>
     </div>

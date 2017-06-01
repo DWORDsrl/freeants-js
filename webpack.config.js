@@ -35,6 +35,8 @@ var config = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
+  externals: {   
+  },
   module: {
     rules: [
       { 

@@ -15,10 +15,13 @@
     "tslint-loader": "^3.5.3",
     "typescript": "^2.3.2",
     "webpack": "^2.5.1",
-    "yargs": "^8.0.1"
+    "yargs": "^8.0.1",
+    "@types/jquery": "^2.0.45",
+    "@types/qs": "^6.2.31",
+    "@types/signalr": "^2.2.33"
   },
   "dependencies": {
-    "@types/jquery": "^2.0.45",
-    "@types/signalr": "^2.2.33"
+    "axios": "^0.16.1",
+    "qs": "^6.4.0"
   }
 }
