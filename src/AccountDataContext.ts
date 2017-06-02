@@ -32,7 +32,7 @@ export class AccountDataContext {
         return AccountDataContext.accountUrl + "/RegisterByOnlyEmail/" + email + "/" + culture;
     }
 
-    public static login(data: any) : AxiosPromise {
+    public static login(data: any) : Promise<any> {
         return axios.post(AccountDataContext.loginUrl,qs.stringify(data),{
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"

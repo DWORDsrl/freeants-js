@@ -368,9 +368,13 @@
             }
 
             $scope.login1 = function() {         
-                FreeAnts.AccountDataContext.login($scope.modelLogin)
-                .then(function(data){
-                    alert("Ok");
+                FreeAnts.AccountManager.login($scope.modelLogin, false)
+                .then(function(loginData) {
+                    $rootScope.loggedIn = true;
+                    $rootScope.lastMsg = "Logged in";
+                })
+                .catch(function(error) {
+                    $rootScope.lastMsg = error.message;
                 });
             }
         }]);
