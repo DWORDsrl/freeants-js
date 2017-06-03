@@ -1,5 +1,6 @@
 import * as qs from "qs"
 import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
+import {Helpers} from "./Helpers";
 import {EndPointAddress} from "./EndPointAddress";
 
 export class AccountDataContext {
@@ -13,10 +14,10 @@ export class AccountDataContext {
     private static confirmAccountByOnlyEmailUrl:string = "";
     private static userloginsUrl:string = "";
 
-    // Must be call before the use of this class
+    // INFO: Is mandatory call before the use of this class
     public static init(endPointAddress: EndPointAddress) {
-        AccountDataContext.loginUrl = endPointAddress.server + "token";
-        AccountDataContext.accountUrl = endPointAddress.server + "/account";
+        AccountDataContext.loginUrl = endPointAddress.server + "/token";
+        AccountDataContext.accountUrl = endPointAddress.api + "/account";
         AccountDataContext.logoutUrl = AccountDataContext.accountUrl + "/logout";
         AccountDataContext.userInfoUrl = AccountDataContext.accountUrl + "/userInfo";
         AccountDataContext.resetPasswordUrl = AccountDataContext.accountUrl + "/ResetPassword";
@@ -37,6 +38,17 @@ export class AccountDataContext {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
+        })
+        .then(function(response) {
+            return response.data;
+        });
+    }
+    public static logout() : Promise<any> {
+        return axios.post(AccountDataContext.logoutUrl, null, {
+            headers: Helpers.securityHeaders
+        })
+        .then(function(response) {
+            return response.data;
         });
     }
 }

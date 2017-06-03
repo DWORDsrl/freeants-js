@@ -1,3 +1,5 @@
+import { shim } from "promise.prototype.finally";
+shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
 import {AccountDataContext} from "./AccountDataContext";
 
 export class AccountManager {
@@ -61,6 +63,14 @@ export class AccountManager {
         AccountManager._apiKey = value;
     }
 
+    public static get accessToken() : string {
+        return AccountManager._accessToken;
+    }
+
+    public static get apiKey() : string {
+        return AccountManager._apiKey;
+    }
+
     public static readLoginData() {
 
         AccountManager._apiKey = "";
@@ -80,9 +90,26 @@ export class AccountManager {
     
     public static login(loginData : any, remember: boolean) : Promise<any> {
         return AccountDataContext.login(loginData)
-        .then(function(response: any) {
-            AccountManager.setLoginData(response.data, remember);
-            return response.data;
+        .then(function(data: any) {
+            AccountManager.setLoginData(data, remember);
+            return data;
         });
     }
+    
+    public static async logout() {
+        try
+        {
+            return await AccountDataContext.logout();
+        }
+        finally {
+            AccountManager.resetLoginData();
+        }
+    }
+  
+    // public static async logout() {
+    //     return await AccountDataContext.logout()        
+    //     .finally(() => {
+    //         AccountManager.resetLoginData();
+    //     })
+    // }
 }

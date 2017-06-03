@@ -210,7 +210,7 @@
         // New SDK
 
         let endPointAddress = {
-            server: "http://titaggocoreportal.azurewebsites.net/",
+            server: "http://titaggocoreportal.azurewebsites.net",
             api: "http://titaggocoreportal.azurewebsites.net/api"
         }
 
@@ -406,6 +406,19 @@
                     }
                 })
             }
+
+            $scope.logout1 = function() {
+                FreeAnts.AccountManager.logout()
+                .then(function(data) {
+                    $rootScope.loggedIn = false;
+                    $rootScope.lastMsg = "Ok";
+                })
+                .catch(function(error) {
+                    $rootScope.loggedIn = false;
+                    $rootScope.lastMsg = error.message;
+                });
+            }
+
         }]);
 
         app.controller('ThingsPositionTestController', ['$q', '$scope', 'ThingModel', 'thingsManager', 'thingsDataContext',
@@ -779,7 +792,7 @@
     </div>
 
     <div ng-if="loggedIn == true" ng-controller="LogoutController">
-        <button ng-click="logout()">
+        <button ng-click="logout1()">
             logout
         </button>
     </div>    

@@ -1,11 +1,14 @@
 # freeants-js
 
 Next Step:  No version
-
-            Implement logout in AccountManager.            
+            
             Use for jQuery "externals" section of "webpack.config.js".
             Try access with apiKey
-            Implement version sistem
+            Implement version system
+
+2017-06-03  No version
+
+            Implemented logout in AccountManager.
 
 2017-06-02: No version
 
