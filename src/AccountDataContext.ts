@@ -1,7 +1,7 @@
 import * as qs from "qs"
 import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
-import {Helpers} from "./Helpers";
-import {EndPointAddress} from "./EndPointAddress";
+import {Helpers} from "./helpers";
+import {EndPointAddress} from "./endPointAddress";
 
 export class AccountDataContext {
 
@@ -39,7 +39,7 @@ export class AccountDataContext {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
         })
-        .then(function(response) {
+        .then(function(response): any {
             return response.data;
         });
     }
@@ -47,7 +47,7 @@ export class AccountDataContext {
         return axios.post(AccountDataContext.logoutUrl, null, {
             headers: Helpers.securityHeaders
         })
-        .then(function(response) {
+        .then(function(response: any): any {
             return response.data;
         });
     }

@@ -215,6 +215,7 @@
         }
 
         FreeAnts.AccountDataContext.init(endPointAddress);
+        FreeAnts.ThingsDataContext.init(endPointAddress);
 
         FreeAnts.AccountManager.appName = "freeants-angular-sample";
         FreeAnts.AccountManager.readLoginData();
@@ -374,6 +375,19 @@
                     $rootScope.lastMsg = "Logged in";
                     // It's useful for Angular 1 data binding after http calls with no Angular 1 library
                     $timeout(null, 1);
+
+                    var getThingsParams = {
+                        parentThingId: null,
+                        filter: "",
+                        top: 10,
+                        skip: 0, 
+                        orderBy: null,
+                        valueFilter: null
+                    };
+                    FreeAnts.ThingsDataContext.getThings(getThingsParams)
+                    .then(function(data){
+                        alert(data);
+                    })
                 })
                 .catch(function(error) {
                     $rootScope.lastMsg = error.message;

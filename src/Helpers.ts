@@ -1,4 +1,11 @@
-import {AccountManager} from "./AccountManager"
+import {AccountManager} from "./accountManager"
+
+export interface ItemsRange {
+    top: number;
+    skip:number;
+    totalItems: number
+}
+
 export class Helpers {
 
     public static get securityHeaders() : any {
@@ -12,5 +19,36 @@ export class Helpers {
             return { "DWApiKey": apiKey };
         }
         return {};
+    }
+
+    public static getRangeItemsFromResponse(response: any) : ItemsRange  {
+        
+        //TODO: It's very useful "response.headers" syntax so for now is good
+        var contentRange = response.headers["content-range"];
+
+        var top: number = 0;
+        var skip: number = 0;
+        var totalItems: number = 0;
+        if (contentRange) {
+            var arr1 = contentRange.split("/");
+            if (arr1.length != 0) {
+                var arr2 = arr1[0].split(" ");
+                if (arr2.length == 2) {
+                    var arr3 = arr2[1].split("-");
+                    if (arr3.length == 2) {
+                        top = parseInt(arr3[0]);
+                        skip = parseInt(arr3[1]);
+                    }
+                }
+
+                if (arr1.length == 2)
+                    totalItems = parseInt(arr1[1]);
+            }
+        }
+        return {
+            top: top,
+            skip: skip,
+            totalItems: totalItems
+        }
     }
 }
