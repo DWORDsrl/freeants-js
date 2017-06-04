@@ -4,16 +4,33 @@ var yargs = require('yargs');
 
 var libraryName = 'FreeAnts';
 
-var plugins = [ new webpack.LoaderOptionsPlugin(
-      {
-        options: {
-          tslint: {
-            emitErrors: true,
-            failOnHint: true
-          }
+function DtsBundlePlugin(){}
+DtsBundlePlugin.prototype.apply = function (compiler) {
+  compiler.plugin('done', function(){
+    var dts = require('dts-bundle');
+
+    dts.bundle({
+      name: libraryName,
+      main: 'dist/index.d.ts',
+      out: 'index.d.ts',
+      removeSource: true,
+      outputAsModuleFolder: true // to use npm in-package typings
+    });
+  });
+};
+
+var plugins = [
+  new webpack.LoaderOptionsPlugin(
+    {
+      options: {
+        tslint: {
+          emitErrors: true,
+          failOnHint: true
         }
-      })
-    ];
+      }
+    }),
+    new DtsBundlePlugin()
+  ];
 
 var outputFile = '';
 if (yargs.argv.p) {

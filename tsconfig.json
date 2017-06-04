@@ -1,17 +1,33 @@
 {
   "compileOnSave": false,
+
   "compilerOptions": {
-    "declaration": false,
-    "jsx": "react",
-    "module": "commonjs",
+    "outDir": "./dist",
+
+    "declaration": true,
+    "declarationDir": ".",
+
+    // Is not possible put major version because UglifyJsPlugin in webpack config does not support major version targhet
+    // in minify process
+    "target": "ES5",
+
+    "lib": [
+      "es2015",
+      "dom",
+      "es5",
+      "scripthost"
+    ],
+
     "noImplicitAny": true,
     "preserveConstEnums": true,
     "removeComments": false,
     "sourceMap": true,
-    "target": "es2017"
+
+    "jsx": "react",
+    "module": "commonjs"
   },
   "include": [
-        "./src/**/*"
+      "./src/**/*"
   ],
   "exclude": [
     "node_modules"

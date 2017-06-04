@@ -10,16 +10,17 @@
   "author": "Carmelo Campione - DWORD s.r.l.",
   "license": "MIT",
   "devDependencies": {
+    "@types/jquery": "^2.0.45",
+    "@types/promise.prototype.finally": "^2.0.0",
+    "@types/qs": "^6.2.31",
+    "@types/signalr": "^2.2.33",
+    "dts-bundle": "^0.7.2",
     "ts-loader": "^2.0.3",
     "tslint": "^5.2.0",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.3.2",
     "webpack": "^2.5.1",
-    "yargs": "^8.0.1",
-    "@types/promise.prototype.finally": "^2.0.0",
-    "@types/jquery": "^2.0.45",
-    "@types/qs": "^6.2.31",
-    "@types/signalr": "^2.2.33"
+    "yargs": "^8.0.1"
   },
   "dependencies": {
     "axios": "^0.16.1",

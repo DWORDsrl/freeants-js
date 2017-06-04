@@ -106,6 +106,7 @@ export class AccountManager {
         }
     }
   
+    // No Async version of logout()
     // public static async logout() {
     //     return await AccountDataContext.logout()        
     //     .finally(() => {

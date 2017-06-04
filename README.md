@@ -1,12 +1,18 @@
 # freeants-js
 
-Next Step:  No version
+Next steps:
             
-            Use for jQuery "externals" section of "webpack.config.js".
+            Try to use jQuery in "externals" section of "webpack.config.js".
             Try access with apiKey
-            Implement version system
+            Implement version system            
+            Implement Bower support
 
-2017-06-03  No version
+2017-06-04  No version
+
+            Generated single FreeAnts.d.ts file with DtsBundlePlugin in webpack config file
+            Some structural fixes
+
+2017-06-03: No version
 
             Implemented logout in AccountManager.
 

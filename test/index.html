@@ -341,8 +341,8 @@
 
         }]);
 
-        app.controller('LoginController', ['$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
-        function LoginController($rootScope, $scope, accountManagerService, mainNotifier) {
+        app.controller('LoginController', ['$timeout', '$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
+        function LoginController($timeout, $rootScope, $scope, accountManagerService, mainNotifier) {
 
             $scope.modelLogin = {
                 grant_type: "password",
@@ -372,15 +372,19 @@
                 .then(function(loginData) {
                     $rootScope.loggedIn = true;
                     $rootScope.lastMsg = "Logged in";
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 })
                 .catch(function(error) {
                     $rootScope.lastMsg = error.message;
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 });
             }
         }]);
 
-         app.controller('LoggedInUserInfosController', ['$rootScope', '$scope', 'accountDataContext', 
-        function LoggedInUserInfosController($rootScope, $scope, accountDataContext) {
+         app.controller('LoggedInUserInfosController', ['$timeout', '$rootScope', '$scope', 'accountDataContext', 
+        function LoggedInUserInfosController($timeout, $rootScope, $scope, accountDataContext) {
             $scope.userIfos = "";
             accountDataContext.getUserInfo()
             .then(function(data) {
@@ -412,10 +416,14 @@
                 .then(function(data) {
                     $rootScope.loggedIn = false;
                     $rootScope.lastMsg = "Ok";
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 })
                 .catch(function(error) {
                     $rootScope.loggedIn = false;
                     $rootScope.lastMsg = error.message;
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 });
             }
 
