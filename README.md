@@ -3,9 +3,13 @@
 Next steps:
             
             Try to use jQuery in "externals" section of "webpack.config.js".
-            Try access with apiKey
-            Implement version system            
+            Try access with apiKey            
             Implement Bower support
+            In package.json fix ""prepublish": "webpack --debug""
+
+2017-06-04  0.0.1
+
+            Implemented SEMVER version system in "package.json"
 
 2017-06-04  No version
 

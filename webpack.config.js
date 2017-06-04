@@ -12,7 +12,7 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
     dts.bundle({
       name: libraryName,
       main: 'dist/index.d.ts',
-      out: 'index.d.ts',
+      out: 'FreeAnts.d.ts',
       removeSource: true,
       outputAsModuleFolder: true // to use npm in-package typings
     });

@@ -1,11 +1,9 @@
 {
-  "name": "freeants-js-test",
-  "version": "0.0.1",
+  "name": "freeants-js-test",  
   "authors": [
     "DWORD s.r.l."
   ],
   "description": "FreeAnts JS SDK - Test",
-  "main": "https://github.com/DWORDsrl/freeants-js",
   "license": "MIT",
   "homepage": "",
   "dependencies": {

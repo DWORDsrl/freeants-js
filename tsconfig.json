@@ -11,11 +11,9 @@
     // in minify process
     "target": "ES5",
 
-    "lib": [
-      "es2015",
+    "lib": [      
       "dom",
-      "es5",
-      "scripthost"
+      "es6"      
     ],
 
     "noImplicitAny": true,
