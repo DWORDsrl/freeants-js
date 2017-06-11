@@ -90,9 +90,9 @@ export class AccountManager {
     
     public static login(loginData : any, remember: boolean) : Promise<any> {
         return AccountDataContext.login(loginData)
-        .then(function(data: any) {
-            AccountManager.setLoginData(data, remember);
-            return data;
+        .then(function(response: any) {
+            AccountManager.setLoginData(response, remember);
+            return response;
         });
     }
     
