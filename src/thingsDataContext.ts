@@ -4,7 +4,7 @@ import {EndPointAddress} from "./endPointAddress";
 import {ThingRaw} from "./thingRaw";
 import * as thingConstants from "./thingConstants";
 
-export interface ThingGetParams {
+export interface ThingsGetParams {
     parentThingId? : string;
     filter? : string;
     top? : number;
@@ -14,7 +14,7 @@ export interface ThingGetParams {
     valueFilter? : string
 }
 
-export interface ThingsDataSet {
+export interface ThingsRawDataSet {
     things:  ThingRaw[];
     itemsRange: ItemsRange
 }
@@ -48,9 +48,8 @@ export class ThingsDataContext {
         ThingsDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
-    // TODO: Define ThingGetParams interface
     // INFO: To abort call "canceler()"
-    public static getThings(parameter: ThingGetParams, canceler?: any) : Promise<any> {
+    public static getThings(parameter: ThingsGetParams, canceler?: any) : Promise<ThingsRawDataSet> {
         var urlRaw = ThingsDataContext.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
                 (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
@@ -69,16 +68,14 @@ export class ThingsDataContext {
                     canceler = c;
                 }) : null
             })
-        .then(function(response: any) : ThingsDataSet {
+        .then(function(response: any) : ThingsRawDataSet {
             return {
                 things: response.data,
                 itemsRange: Helpers.getRangeItemsFromResponse(response)
             };
         });
     }
-
-    // TOCHECK: Check Returned data
-    public static getThing(thingId: string) : Promise<any> {
+    public static getThing(thingId: string) : Promise<ThingRaw> {
         return axios.get(ThingsDataContext.thingsUrl(thingId), {
             headers: Helpers.securityHeaders
         })

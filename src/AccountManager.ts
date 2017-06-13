@@ -94,9 +94,8 @@ export class AccountManager {
             AccountManager.setLoginData(response, remember);
             return response;
         });
-    }
-    
-    public static async logout() {
+    }  
+    public static async logout() : Promise<any> {
         try
         {
             return await AccountDataContext.logout();
@@ -105,12 +104,8 @@ export class AccountManager {
             AccountManager.resetLoginData();
         }
     }
-  
-    // No Async version of logout()
-    // public static async logout() {
-    //     return await AccountDataContext.logout()        
-    //     .finally(() => {
-    //         AccountManager.resetLoginData();
-    //     })
-    // }
+
+    public static async getUserInfo() : Promise<any> {
+        return await AccountDataContext.getUserInfo();
+    }    
 }

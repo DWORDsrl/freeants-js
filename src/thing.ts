@@ -4,8 +4,8 @@ import * as thingConstants from "./thingConstants";
 // TODO: Define class userInfo
 export class Thing {
 
-    private childrenSkip: number = 0;
-    private childrenTotalItems = Number.MAX_SAFE_INTEGER;
+    public childrenSkip: number = 0;
+    public childrenTotalItems = Number.MAX_SAFE_INTEGER;
 
     public children : Thing[] = [];
 
@@ -39,7 +39,27 @@ export class Thing {
     
     public value: any = {}
 
-    constructor(thingRaw : ThingRaw) {
-        Object.assign(this, thingRaw);
+    constructor(thingRaw? : ThingRaw) {
+        if (thingRaw)
+            Object.assign(this, thingRaw);
+    }
+
+    public collapse() : void {
+        this.childrenSkip = 0;
+
+        // INFO: Not reset "this.childrenTotalItems = Number.MAX_SAFE_INTEGER" to trace potential Children number
+        // this.childrenTotalItems = Number.MAX_SAFE_INTEGER;
+
+        // INFO: Useful to maintain original internal array ref
+        this.children.splice(0, this.children.length);
+    }
+
+    public shallowCopy() : Thing {
+
+        let copyThing : Thing = new Thing();
+
+        Object.assign(copyThing, this);
+
+        return copyThing;
     }
 }

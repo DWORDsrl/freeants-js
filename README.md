@@ -3,11 +3,16 @@
 Next steps:
             
             // TODO: Define class "userInfo"
-            Test "thingsDataContext.getThings" call abort/cancellation
+            Test "usersDataContext.getUsers" call with abort/cancellation
+            Test "thingsDataContext.getThings" call with abort/cancellation
             Try to use jQuery in "externals" section of "webpack.config.js"
             Try access with apiKey            
             Implement Bower support
             In package.json fix ""prepublish": "webpack --debug""
+
+2017-06-13  0.0.4
+
+            Completed "usersDataContext" class
 
 2017-06-11  0.0.3
 

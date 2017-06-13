@@ -215,6 +215,7 @@
         }
 
         FreeAnts.AccountDataContext.init(endPointAddress);
+        FreeAnts.UsersDataContext.init(endPointAddress);
         FreeAnts.ThingsDataContext.init(endPointAddress);
 
         FreeAnts.AccountManager.appName = "freeants-angular-sample";
@@ -332,6 +333,7 @@
 
             $rootScope.lastMsg = "Ok";
             $rootScope.loggedIn = false;
+            
             $rootScope.notifierConnectionStatus = mainNotifier.connectionStatus;
 
             if (accountManagerService.checkAccessToken() == true) {
@@ -342,6 +344,7 @@
 
         }]);
 
+        // INFO: Made by new sdk
         app.controller('LoginController', ['$timeout', '$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
         function LoginController($timeout, $rootScope, $scope, accountManagerService, mainNotifier) {
 
@@ -351,43 +354,13 @@
                 password: ""
             }
             
-            $scope.login = function() {
-                accountManagerService.login($scope.modelLogin, true)
-                .then(function (result) {
-                    if (result.status) {
-                        $rootScope.loggedIn = true;
-                        $rootScope.lastMsg = "Logged in";
-                        mainNotifier.subscribe();                        
-                    }
-                    else {
-                        $rootScope.lastMsg = result.data;
-                    }
-                },
-                function (data) {
-                    $rootScope.lastMsg = result.data;
-                });
-            }
-
-            $scope.login1 = function() {         
+            $scope.login = function() {         
                 FreeAnts.AccountManager.login($scope.modelLogin, false)
                 .then(function(loginData) {
                     $rootScope.loggedIn = true;
                     $rootScope.lastMsg = "Logged in";
                     // It's useful for Angular 1 data binding after http calls with no Angular 1 library
                     $timeout(null, 1);
-
-                    var getThingsParams = {
-                        parentThingId: null,
-                        filter: "",
-                        top: 10,
-                        skip: 0, 
-                        orderBy: null,
-                        valueFilter: null
-                    };
-                    FreeAnts.ThingsDataContext.getThings(getThingsParams)
-                    .then(function(data){
-                        alert(data);
-                    })
                 })
                 .catch(function(error) {
                     $rootScope.lastMsg = error.message;
@@ -397,35 +370,27 @@
             }
         }]);
 
-         app.controller('LoggedInUserInfosController', ['$timeout', '$rootScope', '$scope', 'accountDataContext', 
+        // INFO: Made by new sdk
+        app.controller('LoggedInUserInfosController', ['$timeout', '$rootScope', '$scope', 'accountDataContext', 
         function LoggedInUserInfosController($timeout, $rootScope, $scope, accountDataContext) {
-            $scope.userIfos = "";
-            accountDataContext.getUserInfo()
+            $scope.userInfos = "";
+            FreeAnts.AccountManager.getUserInfo()
             .then(function(data) {
                 $scope.userInfos = data;
+                // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                $timeout(null, 1);
             }, function(data) {
                 $rootScope.lastMsg = data;
+                // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                $timeout(null, 1);
             });
         }]);
 
-        app.controller('LogoutController', ['$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
-        function LogoutController($rootScope, $scope, accountManagerService, mainNotifier) {
+        // INFO: Made by new sdk
+        app.controller('LogoutController', ['$timeout','$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
+        function LogoutController($timeout, $rootScope, $scope, accountManagerService, mainNotifier) {
             
             $scope.logout = function() {
-                // TODO: Fix unsubscribe fail
-                mainNotifier.unsubscribe();
-
-                accountManagerService.logout()
-                .then(function (data) {
-                    $rootScope.loggedIn = false;
-                    $rootScope.lastMsg = "Ok";
-                    if (data.status == false) {
-                        $rootScope.lastMsg = data;
-                    }
-                })
-            }
-
-            $scope.logout1 = function() {
                 FreeAnts.AccountManager.logout()
                 .then(function(data) {
                     $rootScope.loggedIn = false;
@@ -808,13 +773,13 @@
     <div ng-if="loggedIn == false" ng-controller="LoginController">
         <input type="text"     ng-model="modelLogin.username" placeholder="email" />
         <input type="password" ng-model="modelLogin.password" placeholder="password" />
-        <button ng-click="login1()">
+        <button ng-click="login()">
             login
         </button>
     </div>
 
     <div ng-if="loggedIn == true" ng-controller="LogoutController">
-        <button ng-click="logout1()">
+        <button ng-click="logout()">
             logout
         </button>
     </div>    

@@ -3,6 +3,12 @@ import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
 import {Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 
+export interface LoginData {
+        grant_type : string;
+        username : string;
+        password : string;
+}
+
 export class AccountDataContext {
 
     private static loginUrl:string = "";
@@ -14,8 +20,15 @@ export class AccountDataContext {
     private static confirmAccountByOnlyEmailUrl:string = "";
     private static userloginsUrl:string = "";
 
+    private static registerByOnlyEmailUrl(email:string, culture:string):string { 
+        return AccountDataContext.accountUrl + "/RegisterByOnlyEmail/" + email + "/" + culture;
+    }  
+    private static forgotPasswordUrl(email:string, culture:string):string { 
+        return AccountDataContext.accountUrl + "/forgotPassword/" + email + "/" + culture;
+    } 
+
     // INFO: Is mandatory call before the use of this class
-    public static init(endPointAddress: EndPointAddress) {
+    public static init(endPointAddress: EndPointAddress) : void {
         AccountDataContext.loginUrl = endPointAddress.server + "/token";
         AccountDataContext.accountUrl = endPointAddress.api + "/account";
         AccountDataContext.logoutUrl = AccountDataContext.accountUrl + "/logout";
@@ -25,26 +38,28 @@ export class AccountDataContext {
         AccountDataContext.confirmAccountByOnlyEmailUrl = AccountDataContext.accountUrl + "/ConfirmAccountByOnlyEmail";
         AccountDataContext.userloginsUrl = AccountDataContext.accountUrl + "/UserLogins";
     }
-    
-    private static forgotPasswordUrl(email:string, culture:string):string { 
-        return AccountDataContext.accountUrl + "/forgotPassword/" + email + "/" + culture;
-    }    
-    private static registerByOnlyEmailUrl(email:string, culture:string):string { 
-        return AccountDataContext.accountUrl + "/RegisterByOnlyEmail/" + email + "/" + culture;
-    }
 
-    public static login(data: any) : Promise<any> {
-        return axios.post(AccountDataContext.loginUrl,qs.stringify(data),{
+    public static login(loginData: LoginData) : Promise<any> {
+        return axios.post(AccountDataContext.loginUrl,qs.stringify(loginData), {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
         })
-        .then(function(response): any {
+        .then(function(response) : any {
             return response.data;
         });
     }
     public static logout() : Promise<any> {
         return axios.post(AccountDataContext.logoutUrl, null, {
+            headers: Helpers.securityHeaders
+        })
+        .then(function(response: any) : any {
+            return response.data;
+        });
+    }
+    
+    public static getUserInfo() : Promise<any> {
+        return axios.get(AccountDataContext.userInfoUrl, {
             headers: Helpers.securityHeaders
         })
         .then(function(response: any): any {
