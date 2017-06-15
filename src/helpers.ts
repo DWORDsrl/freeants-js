@@ -6,6 +6,22 @@ export interface ItemsRange {
     totalItems: number
 }
 
+// INFO: It is a wrapper for "axios" to abort Http calls
+export class HttpRequestCanceler {
+    public cancelerToken : any = null;
+    public executor : any = null;
+
+    public reset() : void {
+        this.executor = null;
+        this.cancelerToken = null;
+    }
+    public cancel() : void {
+        if (this.executor != null)
+            this.executor();
+        this.reset();
+    }
+}
+
 export class Helpers {
 
     public static get securityHeaders() : any {

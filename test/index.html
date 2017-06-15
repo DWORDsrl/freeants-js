@@ -371,8 +371,8 @@
         }]);
 
         // INFO: Made by new sdk
-        app.controller('LoggedInUserInfosController', ['$timeout', '$rootScope', '$scope', 'accountDataContext', 
-        function LoggedInUserInfosController($timeout, $rootScope, $scope, accountDataContext) {
+        app.controller('LoggedInUserInfosController', ['$timeout', '$rootScope', '$scope', 
+        function LoggedInUserInfosController($timeout, $rootScope, $scope) {
             $scope.userInfos = "";
             FreeAnts.AccountManager.getUserInfo()
             .then(function(data) {
@@ -387,8 +387,8 @@
         }]);
 
         // INFO: Made by new sdk
-        app.controller('LogoutController', ['$timeout','$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
-        function LogoutController($timeout, $rootScope, $scope, accountManagerService, mainNotifier) {
+        app.controller('LogoutController', ['$timeout','$rootScope', '$scope', 'mainNotifier', 
+        function LogoutController($timeout, $rootScope, $scope, mainNotifier) {
             
             $scope.logout = function() {
                 FreeAnts.AccountManager.logout()
@@ -509,22 +509,29 @@
             $scope.getMoreThings();
         }]);
 
-        app.controller('UsersListController', ['$q', '$scope', 'UsersManager', 
-        function UsersListController($q, $scope, UsersManager) {
+        // INFO: Made by new sdk
+        app.controller('UsersListController', ['$timeout', '$scope', 
+        function UsersListController($timeout, $scope) {
 
-            var usersManager = new UsersManager();
+            var usersManager = new FreeAnts.UsersManager();
             $scope.users = usersManager.users;
             
-            var abortHttpCalls = $q.defer();
+            var canceler = new FreeAnts.HttpRequestCanceler();
+
             $scope.disableUsersScroll = false;
             $scope.getMoreUsers = function() {
+
+                canceler.cancel();
+
                 if ($scope.disableUsersScroll)
                     return;
 
                 $scope.disableUserScroll = true;
-                usersManager.getMoreUsers(abortHttpCalls)
+                usersManager.getMoreUsers(canceler)
                 .then(function(data) {
-                    $scope.disableUsersScroll = (usersManager.getUsersTotalItems() == usersManager.getUsersItems());
+                    $scope.disableUsersScroll = (usersManager.userTotalItemsCount == usersManager.usersItemsCount);
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 });
             }
         }]);

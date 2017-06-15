@@ -1,7 +1,7 @@
 # freeants-js
 
 Next steps:
-            
+            Implement "accountManager.checkAccessToken()"
             // TODO: Define class "userInfo"
             Test "usersDataContext.getUsers" call with abort/cancellation
             Test "thingsDataContext.getThings" call with abort/cancellation
@@ -10,17 +10,21 @@ Next steps:
             Implement Bower support
             In package.json fix ""prepublish": "webpack --debug""
 
+2017-06-15  0.0.5
+
+            Implemented "UsersManager" class
+
 2017-06-13  0.0.4
 
-            Completed "usersDataContext" class
+            Completed "UsersDataContext" class
 
 2017-06-11  0.0.3
 
-            Completed "thingsDataContext" class
+            Completed "ThingsDataContext" class
 
 2017-06-04  0.0.2
             
-            Implement "thingsDataContext.getThings"
+            Implement "ThingsDataContext.getThings"
 
 2017-06-04  0.0.1
 

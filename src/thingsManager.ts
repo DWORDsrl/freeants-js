@@ -1,4 +1,4 @@
-import {ItemsRange} from "./helpers";
+import {ItemsRange, HttpRequestCanceler} from "./helpers";
 import {ThingsGetParams, ThingsDataContext} from "./thingsDataContext"
 import {Thing} from "./thing"
 
@@ -13,7 +13,7 @@ export class ThingsManager {
         let thingRaw = await ThingsDataContext.getThing(thingId);
         return thingRaw ? new Thing(thingRaw) : null;
     }
-    public static async getThings(parameter: ThingsGetParams , canceler?: any) : Promise<ThingsDataSet> {
+    public static async getThings(parameter: ThingsGetParams , canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
         let thingsRawDataSet = await ThingsDataContext.getThings(parameter, canceler);
 
         let things : Thing[] = [];
@@ -38,7 +38,7 @@ export class ThingsManager {
         return ThingsDataContext.deleteThing(thingId);
     }  
 
-    public static getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler?: any) : Promise<ThingsDataSet> {
+    public static getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         parameter.skip = parentThing.childrenSkip;
         parameter.parentThingId = parentThing.id;

@@ -1,12 +1,15 @@
+import { shim } from "promise.prototype.finally";
+shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
-import {ItemsRange, Helpers} from "./helpers";
+import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 
 export interface UsersGetParams {
-    filter : string;
-    top : number;
-    skip : number
-    orderBy : string
+    filter? : string;
+    top? : number;
+    skip? : number
+    orderBy? : string
 }
 
 export interface UsersRawDataSet {
@@ -35,27 +38,36 @@ export class UsersDataContext {
             return response.data;
         });
     }
-    public static getUsers(parameter : UsersGetParams, canceler?: any) : Promise<UsersRawDataSet> {
-            let urlRaw : string = UsersDataContext.usersUrl() + "?" +
-                    (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
-                    (!!parameter.top ? ("&$top=" + parameter.top) : "") +
-                    (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
-                    (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "");
-
-        var CancelToken = axios.CancelToken;
+    public static getUsers(parameter : UsersGetParams, canceler? : HttpRequestCanceler) : Promise<UsersRawDataSet> {
+        let urlRaw : string = UsersDataContext.usersUrl() + "?" +
+                (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
+                (!!parameter.top ? ("&$top=" + parameter.top) : "") +
+                (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
+                (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "");
+        
+        if (canceler != undefined) {            
+            if (canceler.cancelerToken == null) {
+                var CancelToken = axios.CancelToken;
+                canceler.cancelerToken = new CancelToken(function executor(c) {
+                    canceler.executor = c;
+                });
+            }
+        }
         
         return axios.get(urlRaw, {
                 headers: Helpers.securityHeaders,
-                cancelToken: canceler != undefined ? new CancelToken(function executor(c) {
-                    canceler = c;
-                }) : null
+                cancelToken: (canceler != undefined) ? canceler.cancelerToken : null
             })
-        .then(function(response: any) : UsersRawDataSet {
-            return {
-                users: response.data,
-                itemsRange: Helpers.getRangeItemsFromResponse(response)
-            };
-        });
+            .then(function(response: any) : UsersRawDataSet {
+                return {
+                    users: response.data,
+                    itemsRange: Helpers.getRangeItemsFromResponse(response)
+                };
+            })
+            .finally(function() {
+                if (canceler != undefined)
+                    canceler.reset();
+            });
     }
     public static createUser(userRaw: any) : Promise<any> {
         return axios.post(UsersDataContext.usersUrl(), userRaw, {
@@ -75,7 +87,7 @@ export class UsersDataContext {
         });
     }
     // TOCHECK: Check Returned data
-    public static deleteThing(userId: string) : Promise<any> {
+    public static deleteUser(userId: string) : Promise<any> {
         return axios.delete(UsersDataContext.usersUrl(userId), {
             headers: Helpers.securityHeaders
         })

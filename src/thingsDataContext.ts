@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
-import {ItemsRange, Helpers} from "./helpers";
+import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 import {ThingRaw} from "./thingRaw";
 import * as thingConstants from "./thingConstants";
@@ -49,7 +49,7 @@ export class ThingsDataContext {
     }
 
     // INFO: To abort call "canceler()"
-    public static getThings(parameter: ThingsGetParams, canceler?: any) : Promise<ThingsRawDataSet> {
+    public static getThings(parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsRawDataSet> {
         var urlRaw = ThingsDataContext.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
                 (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
@@ -65,7 +65,7 @@ export class ThingsDataContext {
         return axios.get(urlRaw, {
                 headers: Helpers.securityHeaders,
                 cancelToken: canceler != undefined ? new CancelToken(function executor(c) {
-                    canceler = c;
+                    canceler.cancelerToken = c;
                 }) : null
             })
         .then(function(response: any) : ThingsRawDataSet {
