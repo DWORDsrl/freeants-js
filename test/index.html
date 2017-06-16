@@ -227,8 +227,8 @@
 
         'use strict'
 
-        app.factory('mainNotifier', ['$rootScope', 'notifierConnector', 'accountManager', 'path', '$timeout',
-        function ($rootScope, notifierConnector, accountManager, path, $timeout) {
+        app.factory('mainNotifier', ['$rootScope', 'notifierConnector', 'path', '$timeout',
+        function ($rootScope, notifierConnector, path, $timeout) {
 
             function connectionStatus(change) {
                 switch (change.newState) {
@@ -315,9 +315,13 @@
                 $timeout(null, 1);
             });
 
+            function dummyGetAccessToken() {
+                return FreeAnts.AccountManager.accessToken;
+            }
+
             var extport = {
                 subscribe: function () {
-                    notifierConnector.subscribe(path.server + "signalr", "Bearer", accountManager.getAccessToken, subscribeSuccess, subscribeFail);
+                    notifierConnector.subscribe(path.server + "signalr", "Bearer", dummyGetAccessToken, subscribeSuccess, subscribeFail);
                 },
                 unsubscribe: function () {
                     notifierConnector.unsubscribe();
@@ -328,15 +332,15 @@
             return extport;
         }])
 
-        app.run(['$rootScope', 'accountManagerService', 'mainNotifier', 
-        function ($rootScope, accountManagerService, mainNotifier) {
+        app.run(['$rootScope', 'mainNotifier', 
+        function ($rootScope,  mainNotifier) {
 
             $rootScope.lastMsg = "Ok";
             $rootScope.loggedIn = false;
             
             $rootScope.notifierConnectionStatus = mainNotifier.connectionStatus;
 
-            if (accountManagerService.checkAccessToken() == true) {
+            if (FreeAnts.AccountManager.checkAccessToken() == true) {
                 $rootScope.loggedIn = true;
 
                 mainNotifier.subscribe();
@@ -355,7 +359,7 @@
             }
             
             $scope.login = function() {         
-                FreeAnts.AccountManager.login($scope.modelLogin, false)
+                FreeAnts.AccountManager.login($scope.modelLogin, true)
                 .then(function(loginData) {
                     $rootScope.loggedIn = true;
                     $rootScope.lastMsg = "Logged in";
@@ -374,7 +378,7 @@
         app.controller('LoggedInUserInfosController', ['$timeout', '$rootScope', '$scope', 
         function LoggedInUserInfosController($timeout, $rootScope, $scope) {
             $scope.userInfos = "";
-            FreeAnts.AccountManager.getUserInfo()
+            FreeAnts.AccountManager.getLoggedInUserInfo()
             .then(function(data) {
                 $scope.userInfos = data;
                 // It's useful for Angular 1 data binding after http calls with no Angular 1 library

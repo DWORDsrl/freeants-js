@@ -4,49 +4,62 @@ import {AccountDataContext} from "./accountDataContext";
 
 export class AccountManager {
     
-    private static _appName: string = "";    
+    private static _appName: string = null;    
 
-    private static _accessToken:string = "";
-    private static _userId: string = "";
-    private static _userName: string = "";
+    private static _accessToken:string = null;
+    private static _accessTokenDate: string = null;
+
+    private static _userId: string = null;
+    private static _userName: string = null;
     
     //INFO: apiKey is never persistent
-    private static _apiKey = "";
+    private static _apiKey : string = null;
 
-    private static resetLoginData() {
-        AccountManager._apiKey = "";
+    private static resetLoginData() : void {
+        AccountManager._apiKey = null;
 
-        AccountManager._accessToken = "";
-        AccountManager._userId = "";
-        AccountManager._userName = "";
+        AccountManager._accessToken = null;
+        AccountManager._accessTokenDate = null;
 
-        sessionStorage.removeItem(AccountManager._appName + "_Remember");
+        AccountManager._userId = null;
+        AccountManager._userName = null;
+
+        localStorage.removeItem(AccountManager._appName + "_Remember");
 
         localStorage.removeItem(AccountManager._appName + "_AccessToken");
-        sessionStorage.removeItem(AccountManager._appName + "_AccessToken");
+        sessionStorage.removeItem(AccountManager._appName + "_AccessToken");        
+        localStorage.removeItem(AccountManager._appName + "_AccessTokenDate");
+        sessionStorage.removeItem(AccountManager._appName + "_AccessTokenDate");
+
         localStorage.removeItem(AccountManager._appName + "_UserId");
         sessionStorage.removeItem(AccountManager._appName + "_UserId");
         localStorage.removeItem(AccountManager._appName + "_Username");
         sessionStorage.removeItem(AccountManager._appName + "_Username");
     }
-    private static setLoginData(loginData: any, remember: boolean) {
+    private static setLoginData(loginData: any, remember: boolean) : void {
         
-        AccountManager._apiKey = "";
+        AccountManager._apiKey = null;
 
         AccountManager._accessToken = loginData.access_token;
+        AccountManager._accessTokenDate = loginData[".expires"];
+
         AccountManager._userId = loginData.userId;
         AccountManager._userName = loginData.userName;
 
         sessionStorage.setItem(AccountManager._appName + "_AccessToken", AccountManager._accessToken);
+        sessionStorage.setItem(AccountManager._appName + "_AccessTokenDate", AccountManager._accessTokenDate);
+
         sessionStorage.setItem(AccountManager._appName + "_UserId", AccountManager._userId);
         sessionStorage.setItem(AccountManager._appName + "_Username", AccountManager._userName);
 
-        sessionStorage.setItem(AccountManager._appName + "_Remember", remember == true ? "true" : "false");
+        localStorage.setItem(AccountManager._appName + "_Remember", remember == true ? "true" : "false");
 
         if (remember == false)
             return
 
         localStorage.setItem(AccountManager._appName + "_AccessToken", AccountManager._accessToken);
+        localStorage.setItem(AccountManager._appName + "_AccessTokenDate", AccountManager._accessTokenDate);
+
         localStorage.setItem(AccountManager._appName + "_UserId", AccountManager._userId);
         localStorage.setItem(AccountManager._appName + "_Username", AccountManager._userName);
     }
@@ -73,19 +86,37 @@ export class AccountManager {
 
     public static readLoginData() {
 
-        AccountManager._apiKey = "";
+        // INFO: By design ApiKey is never persistent
+        AccountManager._apiKey = null;
 
         AccountManager._accessToken = sessionStorage.getItem(AccountManager._appName + "_AccessToken");
+        AccountManager._accessTokenDate = sessionStorage.getItem(AccountManager._appName + "_AccessTokenDate");
+
         AccountManager._userId = sessionStorage.getItem(AccountManager._appName + "_UserId");
         AccountManager._userName = sessionStorage.getItem(AccountManager._appName + "_Username");
 
-        let remember = localStorage.getItem(AccountManager.appName + "_Remember") == "true" ? true : false;
+        let remember = localStorage.getItem(AccountManager._appName + "_Remember") == "true" ? true : false;
         if (remember == false)
             return;
 
         AccountManager._accessToken = localStorage.getItem(AccountManager._appName + "_AccessToken");
+        AccountManager._accessTokenDate = localStorage.getItem(AccountManager._appName + "_AccessTokenDate");
+
         AccountManager._userId = localStorage.getItem(AccountManager._appName + "_UserId");
         AccountManager._userName = localStorage.getItem(AccountManager._appName + "_Username");
+    }
+
+    public static checkAccessToken() : boolean {
+        if (AccountManager._accessToken != null) {
+            let now : Date = new Date();
+            let now_utc : Date = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+            if (Date.parse(AccountManager._accessTokenDate) <= now_utc.getTime()) {
+                AccountManager.resetLoginData();
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
     
     public static login(loginData : any, remember: boolean) : Promise<any> {
@@ -105,7 +136,7 @@ export class AccountManager {
         }
     }
 
-    public static async getUserInfo() : Promise<any> {
+    public static async getLoggedInUserInfo() : Promise<any> {
         return await AccountDataContext.getUserInfo();
     }    
 }

@@ -1,7 +1,6 @@
 # freeants-js
 
-Next steps:
-            Implement "accountManager.checkAccessToken()"
+Next steps:            
             // TODO: Define class "userInfo"
             Test "usersDataContext.getUsers" call with abort/cancellation
             Test "thingsDataContext.getThings" call with abort/cancellation
@@ -9,6 +8,10 @@ Next steps:
             Try access with apiKey            
             Implement Bower support
             In package.json fix ""prepublish": "webpack --debug""
+
+2017-06-16  0.0.6
+
+            Implement "accountManager.checkAccessToken()"
 
 2017-06-15  0.0.5
 
