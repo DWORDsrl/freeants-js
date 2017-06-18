@@ -1,5 +1,6 @@
 export * from "./helpers";
 export * from "./endPointAddress";
+export * from "./notifiers";
 export * from "./accountDataContext";// TO CHECK: Is export necessary except for init?
 export * from "./accountManager";
 export * from "./usersDataContext"; // TO CHECK: Is export necessary except for init?

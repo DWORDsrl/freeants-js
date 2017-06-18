@@ -1,25 +1,25 @@
-export enum ThingUserRoles {
+export const enum ThingUserRoles {
     Administrator = 1,
     User = 2,
     SuperAdministrator = 4// TODO: Maybe you do not need it
 }
 
-export enum ThingUserStatus {
+export const enum ThingUserStatus {
     Ok = 1,
     WaitForAuth = 2
 }
 
-export enum ThingUserVisibility {
+export const enum ThingUserVisibility {
     Visible = 1,
     Hidden =  2
 }
 
-export enum ThingDeletedStatus {
+export const enum ThingDeletedStatus {
     Ok = 1,
     Deleted =  2
 }
 
-export enum ThingUserReadClaims {
+export const enum ThingUserReadClaims {
     CanReadThingUserChangeClaims = 1,
     CanReadCreationDate = 2,
     CanReadName = 4,
@@ -52,7 +52,7 @@ export enum ThingUserReadClaims {
     */
 }
 
-export enum ThingUserChangeClaims {
+export const enum ThingUserChangeClaims {
 
     CanDeleteThing = 1,
     CanChangeName = 2,

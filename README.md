@@ -1,13 +1,26 @@
 # freeants-js
 
-Next steps:            
+Next steps:
+
             // TODO: Define class "userInfo"
+			
             Test "usersDataContext.getUsers" call with abort/cancellation
+			
             Test "thingsDataContext.getThings" call with abort/cancellation
+			
             Try to use jQuery in "externals" section of "webpack.config.js"
+			
             Try access with apiKey            
+			
             Implement Bower support
+			
+			Implement NPM support
+			
             In package.json fix ""prepublish": "webpack --debug""
+
+2017-06-18  0.0.7
+
+            Implemented "Notifiers"
 
 2017-06-16  0.0.6
 

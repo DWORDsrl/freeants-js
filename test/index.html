@@ -10,7 +10,7 @@
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-translate/angular-translate.min.js"></script>
-    <script src="bower_components/signalr/jquery.signalR.min.js"></script>
+    <script src="bower_components/signalr/jquery.signalR.js"></script>
     <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
     
      <!-- Must be the First -->    
@@ -199,14 +199,6 @@
             //api: "http://titaggocoreportal-slot1.azurewebsites.net/api"
         });
 
-        app.config(['accountManagerProvider',
-        function (accountManagerProvider) {
-
-            accountManagerProvider.setAppName("freeants-angular-sample", "AccessTokenOrDWApiKey");
-            accountManagerProvider.readLoginData();           
-
-        }]);
-
         // New SDK
 
         let endPointAddress = {
@@ -219,7 +211,7 @@
         FreeAnts.ThingsDataContext.init(endPointAddress);
 
         FreeAnts.AccountManager.appName = "freeants-angular-sample";
-        FreeAnts.AccountManager.readLoginData();
+        FreeAnts.AccountManager.readLoginData();        
 
     </script>
         
@@ -227,34 +219,39 @@
 
         'use strict'
 
-        app.factory('mainNotifier', ['$rootScope', 'notifierConnector', 'path', '$timeout',
-        function ($rootScope, notifierConnector, path, $timeout) {
+        // INFO: Made by new sdk
+        app.factory('mainNotifier', ['$timeout','$rootScope',
+        function ($timeout, $rootScope) {
 
-            function connectionStatus(change) {
+            function getAccessToken() {
+                return FreeAnts.AccountManager.accessToken;
+            }
+
+            function onConnectionStatusChanged(change) {
                 switch (change.newState) {
-                    case notifierConnector.connected:
+                    case FreeAnts.ConnectionState.Connected:
                         {
-                            $rootScope.notifierConnectionStatus = notifierConnector.connected;
+                            $rootScope.notifierConnectionStatus = FreeAnts.ConnectionState.Connected;
                             break;
                         }
-                    case notifierConnector.connecting:
+                    case FreeAnts.ConnectionState.Connecting:
                         {
-                            $rootScope.notifierConnectionStatus = notifierConnector.connecting;
+                            $rootScope.notifierConnectionStatus = FreeAnts.ConnectionState.Connecting;
                             break;
                         }
-                    case notifierConnector.reconnecting:
+                    case FreeAnts.ConnectionState.Reconnecting:
                         {
-                            $rootScope.notifierConnectionStatus = notifierConnector.reconnecting;
+                            $rootScope.notifierConnectionStatus = FreeAnts.ConnectionState.Reconnecting;
                             break;
                         }
-                    case notifierConnector.disconnected:
+                    case FreeAnts.ConnectionState.Disconnected:
                         {
-                            $rootScope.notifierConnectionStatus = notifierConnector.disconnected;
+                            $rootScope.notifierConnectionStatus = FreeAnts.ConnectionState.Disconnected;
                             break;
                         }
                     default:
                         {
-                            $rootScope.notifierConnectionStatus = notifierConnector.disconnected;
+                            $rootScope.notifierConnectionStatus = FreeAnts.ConnectionState.Disconnected;
                             break;
                         }
                 }
@@ -262,19 +259,22 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             }
-            function onReconnected() { }
+            function onReconnected() {
+            }
 
-            notifierConnector.init(connectionStatus, onReconnected);
-
-            function subscribeSuccess() {
+            function onSubscribeSuccess() {
                 $rootScope.lastMsg = "Logged in";
             }
-            function subscribeFail() {
-
+            function onSubscribeFail() {
                 $rootScope.lastMsg = "SignalR Subscribe Failed";                
             }
 
-            notifierConnector.setHook('onCreateThing', function (thing) {
+            var notifier = new FreeAnts.SignalRNotifier(endPointAddress.server, 
+                "Bearer", getAccessToken, 
+                onConnectionStatusChanged, onReconnected,
+                onSubscribeSuccess, onSubscribeFail);
+
+            notifier.setHook('onCreateThing', function (thing) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -282,7 +282,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifierConnector.setHook('onDeleteThing', function (thingId) {
+            notifier.setHook('onDeleteThing', function (thingId) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -290,7 +290,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifierConnector.setHook('onCreateChildThingId', function (parent, child, kind) {
+            notifier.setHook('onCreateChildThingId', function (parent, child, kind) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -298,7 +298,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifierConnector.setHook('onUpdateThingValue', function (thingId, value) {
+            notifier.setHook('onUpdateThingValue', function (thingId, value) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -306,7 +306,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifierConnector.setHook('onDeleteChildThingId', function (parent, child, kind) {
+            notifier.setHook('onDeleteChildThingId', function (parent, child, kind) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -315,30 +315,25 @@
                 $timeout(null, 1);
             });
 
-            function dummyGetAccessToken() {
-                return FreeAnts.AccountManager.accessToken;
-            }
-
-            var extport = {
+            var _export = {
                 subscribe: function () {
-                    notifierConnector.subscribe(path.server + "signalr", "Bearer", dummyGetAccessToken, subscribeSuccess, subscribeFail);
+                    notifier.subscribe();
                 },
                 unsubscribe: function () {
-                    notifierConnector.unsubscribe();
-                },
-                connectionStatus: notifierConnector.disconnected
+                    notifier.unsubscribe();
+                }
             }
 
-            return extport;
+            return _export;
         }])
 
-        app.run(['$rootScope', 'mainNotifier', 
-        function ($rootScope,  mainNotifier) {
+        // INFO: Made by new sdk
+        app.run(['$rootScope', 'mainNotifier', '$timeout', 
+        function ($rootScope,  mainNotifier, $timeout) {
 
             $rootScope.lastMsg = "Ok";
             $rootScope.loggedIn = false;
-            
-            $rootScope.notifierConnectionStatus = mainNotifier.connectionStatus;
+            $rootScope.notifierConnectionStatus = FreeAnts.ConnectionState.Disconnected;
 
             if (FreeAnts.AccountManager.checkAccessToken() == true) {
                 $rootScope.loggedIn = true;
@@ -349,8 +344,8 @@
         }]);
 
         // INFO: Made by new sdk
-        app.controller('LoginController', ['$timeout', '$rootScope', '$scope', 'accountManagerService', 'mainNotifier', 
-        function LoginController($timeout, $rootScope, $scope, accountManagerService, mainNotifier) {
+        app.controller('LoginController', ['$timeout', '$rootScope', '$scope',  'mainNotifier', 
+        function LoginController($timeout, $rootScope, $scope, mainNotifier) {
 
             $scope.modelLogin = {
                 grant_type: "password",
@@ -363,6 +358,7 @@
                 .then(function(loginData) {
                     $rootScope.loggedIn = true;
                     $rootScope.lastMsg = "Logged in";
+                    mainNotifier.subscribe();
                     // It's useful for Angular 1 data binding after http calls with no Angular 1 library
                     $timeout(null, 1);
                 })
@@ -395,6 +391,9 @@
         function LogoutController($timeout, $rootScope, $scope, mainNotifier) {
             
             $scope.logout = function() {
+                // TODO: Fix unsubscribe fail
+                mainNotifier.unsubscribe();
+
                 FreeAnts.AccountManager.logout()
                 .then(function(data) {
                     $rootScope.loggedIn = false;
