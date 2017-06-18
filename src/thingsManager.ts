@@ -74,4 +74,10 @@ export class ThingsManager {
         });
     } 
 
+    public static collapseThing(thing : Thing, canceler : HttpRequestCanceler) {
+        if (canceler)
+            canceler.cancel();
+        thing.collapse();
+    }
+
 }

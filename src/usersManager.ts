@@ -1,3 +1,4 @@
+import {HttpRequestCanceler} from "./helpers";
 import {UsersGetParams, UsersRawDataSet, UsersDataContext} from "./usersDataContext"
 
 export class UsersManager {
@@ -31,7 +32,7 @@ export class UsersManager {
         return UsersDataContext.getUser(userId);
     }
 
-    public getMoreUsers(canceler?: any) : Promise<UsersRawDataSet> {
+    public getMoreUsers(canceler?: HttpRequestCanceler) : Promise<UsersRawDataSet> {
 
             var self = this;
 

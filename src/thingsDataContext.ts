@@ -49,30 +49,38 @@ export class ThingsDataContext {
     }
 
     // INFO: To abort call "canceler()"
-    public static getThings(parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsRawDataSet> {
+    public static getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsRawDataSet> {
         var urlRaw = ThingsDataContext.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
                 (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
                 (!!parameter.top ? ("&$top=" + parameter.top) : "") +
                 (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
-                (parameter.deleteStatus == null || parameter.deleteStatus == undefined ? "" : 
-                    "&$deletedStatus=" + parameter.deleteStatus) +
+                (parameter.deleteStatus == null || parameter.deleteStatus == undefined ? "" : "&$deletedStatus=" + parameter.deleteStatus) +
                 (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "") +
                 (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "");
 
-        var CancelToken = axios.CancelToken;
+        if (canceler != undefined) {            
+            if (canceler.cancelerToken == null) {
+                var CancelToken = axios.CancelToken;
+                canceler.cancelerToken = new CancelToken(function executor(c) {
+                    canceler.executor = c;
+                });
+            }
+        }
         
         return axios.get(urlRaw, {
                 headers: Helpers.securityHeaders,
-                cancelToken: canceler != undefined ? new CancelToken(function executor(c) {
-                    canceler.cancelerToken = c;
-                }) : null
+                cancelToken: (canceler != undefined) ? canceler.cancelerToken : null
             })
         .then(function(response: any) : ThingsRawDataSet {
             return {
                 things: response.data,
                 itemsRange: Helpers.getRangeItemsFromResponse(response)
-            };
+            }
+        })
+        .finally(function() {
+            if (canceler != undefined)
+                canceler.reset();
         });
     }
     public static getThing(thingId: string) : Promise<ThingRaw> {
@@ -112,7 +120,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static getThingChildrenIds(parentThingId: string) : Promise<any> {
+    public static getThingChildrenIds(parentThingId : string) : Promise<any> {
         return axios.get(ThingsDataContext.thingChildrenUrl(parentThingId), {
             headers: Helpers.securityHeaders
         })
@@ -122,7 +130,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static addChildToParent(parentThingId: string, childThingId: string) : Promise<any> {
+    public static addChildToParent(parentThingId : string, childThingId : string) : Promise<any> {
         return axios.post(ThingsDataContext.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
             headers: Helpers.securityHeaders
         })
@@ -132,7 +140,7 @@ export class ThingsDataContext {
         })
     }
     // TOCHECK: Check Returned data
-    public static deleteThingChild(parentThingId: string, childThingId: string) : Promise<any> {
+    public static deleteThingChild(parentThingId : string, childThingId : string) : Promise<any> {
         return axios.delete(ThingsDataContext.thingDeleteChildUrl(parentThingId, childThingId), {
             headers: Helpers.securityHeaders
         })
@@ -141,7 +149,7 @@ export class ThingsDataContext {
         })
     }
 
-    public static getThingValue(thingId: string, value: any) : Promise<any> {
+    public static getThingValue(thingId : string, value: any) : Promise<any> {
         return axios.get(ThingsDataContext.thingsValueUrl(thingId), {
             headers: Helpers.securityHeaders
         })
@@ -149,7 +157,7 @@ export class ThingsDataContext {
             return response.data;
         })
     }
-    public static putThingValue(thingId:string, value:any): Promise<any> {
+    public static putThingValue(thingId : string, value : any): Promise<any> {
         return axios.put(ThingsDataContext.thingsValueUrl(thingId), value, {
             headers: Helpers.securityHeaders
         })
@@ -159,6 +167,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
+    // TOCHECK: Is it deprecated?
     public static putThingPosition(parentThingId: string, childThingId: string, position: number):Promise<any> {
         return axios.put(ThingsDataContext.thingsPositionUrl(), 
             JSON.stringify({
@@ -174,8 +183,8 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static putThingsPositions(positions: number[]):Promise<any> {
-        return axios.put(ThingsDataContext.thingsPositionUrl(), 
+    public static putThingsPositions(positions: any[]):Promise<any> {
+        return axios.put(ThingsDataContext.thingsPositionsUrl(), 
             positions, 
             {
                 headers: Helpers.securityHeaders

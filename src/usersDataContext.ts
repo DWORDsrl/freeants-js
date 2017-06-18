@@ -39,6 +39,7 @@ export class UsersDataContext {
         });
     }
     public static getUsers(parameter : UsersGetParams, canceler? : HttpRequestCanceler) : Promise<UsersRawDataSet> {
+        
         let urlRaw : string = UsersDataContext.usersUrl() + "?" +
                 (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
                 (!!parameter.top ? ("&$top=" + parameter.top) : "") +

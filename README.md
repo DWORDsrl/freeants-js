@@ -1,12 +1,14 @@
 # freeants-js
 
+Helpful commands:
+
+            To build: npm run prepublish
+
 Next steps:
 
-            // TODO: Define class "userInfo"
+            Define class "userInfo"
 			
-            Test "usersDataContext.getUsers" call with abort/cancellation
-			
-            Test "thingsDataContext.getThings" call with abort/cancellation
+            Test "usersDataContext.getUsers" call with abort/cancellation		
 			
             Try to use jQuery in "externals" section of "webpack.config.js"
 			
@@ -14,9 +16,13 @@ Next steps:
 			
             Implement Bower support
 			
-			Implement NPM support
+            Implement NPM support
 			
             In package.json fix ""prepublish": "webpack --debug""
+
+2017-06-18  0.0.8
+
+            Tested "thingsDataContext.getThings" call with abort/cancellation
 
 2017-06-18  0.0.7
 
@@ -68,7 +74,3 @@ Next steps:
 2017-05-18: No version
 
             Added "jQuery" and aps.net SignalR support
-
-Helpful commands:
-
-            To build: npm run prepublish

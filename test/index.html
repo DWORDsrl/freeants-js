@@ -411,10 +411,11 @@
 
         }]);
 
-        app.controller('ThingsPositionTestController', ['$q', '$scope', 'ThingModel', 'thingsManager', 'thingsDataContext',
-        function ThingsPositionTestController($q, $scope, ThingModel, thingsManager, thingsDataContext) {
+        // INFO: Made by new sdk
+        app.controller('ThingsPositionTestController', ['$timeout', '$scope',
+        function ThingsPositionTestController($timeout, $scope) {
 
-            $scope.mainThing = new ThingModel({});
+            $scope.mainThing = new FreeAnts.Thing();
             
             var getThingsParams = {
 
@@ -426,16 +427,22 @@
                 valueFilter: null
             };
 
-            var abortHttpCalls = $q.defer();
-            $scope.disableThingsScroll = true;
+            var canceler = new FreeAnts.HttpRequestCanceler();
+
+            $scope.disableThingsScroll = true; // INFO: Set to false to try this controller
             $scope.getMoreThings = function() {
+
+                canceler.cancel();
 
                 if ($scope.disableThingsScroll)
                     return;
+
                 $scope.disableThingsScroll = true;
-                thingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, abortHttpCalls)
+                FreeAnts.ThingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, canceler)
                 .then(function(data) {                    
                     $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 }, function(data) {
 
                 });
@@ -456,7 +463,7 @@
                     thing.pos = i;
                     positions.push({parentId: null, childId: thing.id, pos: thing.pos});
                 }
-                thingsDataContext.putThingsPositions(positions)
+                FreeAnts.ThingsDataContext.putThingsPositions(positions)
                 .then(function(data) {
                     alert("Update pos ok");
                 },
@@ -480,7 +487,7 @@
                     thing.pos = i;
                     positions.push({parentId: null, childId: thing.id, pos: thing.pos});
                 }
-                thingsDataContext.putThingsPositions(positions)
+                FreeAnts.ThingsDataContext.putThingsPositions(positions)
                 .then(function(data) {
                     alert("Update pos ok");
                 },
@@ -500,7 +507,7 @@
                     thing.pos = i;
                     positions.push({parentId: null, childId: thing.id, pos: thing.pos});
                 }
-                thingsDataContext.putThingsPositions(positions)
+                FreeAnts.ThingsDataContext.putThingsPositions(positions)
                 .then(function(data) {
                     alert("Update pos ok");
                 },
@@ -521,7 +528,7 @@
             
             var canceler = new FreeAnts.HttpRequestCanceler();
 
-            $scope.disableUsersScroll = false;
+            $scope.disableUsersScroll = true; //INFO: Set to true to try this controller
             $scope.getMoreUsers = function() {
 
                 canceler.cancel();
@@ -539,11 +546,11 @@
             }
         }]);
 
-        app.controller('SearchThingController', ['$q', '$scope', 'ThingModel', 'thingsManager', 
-        function SearchThingController($q, $scope, ThingModel, thingsManager) {
+        app.controller('SearchThingController', ['$timeout', '$scope', 
+        function SearchThingController($timeout, $scope) {
 
             $scope.searchQuery = "";
-            $scope.mainThing = new ThingModel({});
+            $scope.mainThing = new FreeAnts.Thing();
             
             var getThingsParams = {
 
@@ -555,37 +562,47 @@
                 valueFilter: null
             };
 
+            var searchCanceler = null;
+
             $scope.searchThing = function() {
                 
-                $scope.disableThingsScroll = true;                
+                $scope.disableThingsScroll = true;
 
-                thingsManager.collapseThing($scope.mainThing, abortHttpCalls);
+                FreeAnts.ThingsManager.collapseThing($scope.mainThing, searchCanceler);
 
                 if (!$scope.searchQuery)
-                    return;
-
-                abortHttpCalls = $q.defer();
+                    return;                
 
                 getThingsParams.filter = "contains(Name,'" + $scope.searchQuery + "') or contains(Id,'" + $scope.searchQuery + "') or contains(Kind,'" + $scope.searchQuery + "')";
 
-                thingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, abortHttpCalls)
+                searchCanceler = new FreeAnts.HttpRequestCanceler();
+
+                FreeAnts.ThingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, searchCanceler)
                 .then(function() {
                     $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 }, function(data) {
 
                 });
             }
 
-            var abortHttpCalls = $q.defer();
+            var moreThingsCanceler = new FreeAnts.HttpRequestCanceler();
+
             $scope.disableThingsScroll = false;              
             $scope.getMoreThings = function() {
 
+                moreThingsCanceler.cancel();
+
                 if ($scope.disableThingsScroll)
                     return;
+
                 $scope.disableThingsScroll = true;
-                thingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, abortHttpCalls)
+                FreeAnts.ThingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, moreThingsCanceler)
                 .then(function() {
                     $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
+                    // It's useful for Angular 1 data binding after http calls with no Angular 1 library
+                    $timeout(null, 1);
                 }, function(data) {
 
                 });
