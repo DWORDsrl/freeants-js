@@ -8,9 +8,10 @@
 
     <!-- Base Libraries -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/signalr/jquery.signalR.js"></script>
+
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-translate/angular-translate.min.js"></script>
-    <script src="bower_components/signalr/jquery.signalR.js"></script>
     <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
     
      <!-- Must be the First -->    
@@ -208,6 +209,7 @@
 
         FreeAnts.AccountDataContext.init(endPointAddress);
         FreeAnts.UsersDataContext.init(endPointAddress);
+        FreeAnts.ThingsUserRightsDataContext.init(endPointAddress);
         FreeAnts.ThingsDataContext.init(endPointAddress);
 
         FreeAnts.AccountManager.appName = "freeants-angular-sample";
@@ -463,7 +465,7 @@
                     thing.pos = i;
                     positions.push({parentId: null, childId: thing.id, pos: thing.pos});
                 }
-                FreeAnts.ThingsDataContext.putThingsPositions(positions)
+                FreeAnts.ThingsManager.putThingsPositions(positions)
                 .then(function(data) {
                     alert("Update pos ok");
                 },
@@ -487,7 +489,7 @@
                     thing.pos = i;
                     positions.push({parentId: null, childId: thing.id, pos: thing.pos});
                 }
-                FreeAnts.ThingsDataContext.putThingsPositions(positions)
+                FreeAnts.ThingsManager.putThingsPositions(positions)
                 .then(function(data) {
                     alert("Update pos ok");
                 },
@@ -507,7 +509,7 @@
                     thing.pos = i;
                     positions.push({parentId: null, childId: thing.id, pos: thing.pos});
                 }
-                FreeAnts.ThingsDataContext.putThingsPositions(positions)
+                FreeAnts.ThingsManager.putThingsPositions(positions)
                 .then(function(data) {
                     alert("Update pos ok");
                 },
@@ -546,6 +548,7 @@
             }
         }]);
 
+        // INFO: Made by new sdk
         app.controller('SearchThingController', ['$timeout', '$scope', 
         function SearchThingController($timeout, $scope) {
 
@@ -568,7 +571,10 @@
                 
                 $scope.disableThingsScroll = true;
 
-                FreeAnts.ThingsManager.collapseThing($scope.mainThing, searchCanceler);
+                if (searchCanceler)
+                    searchCanceler.cancel();
+
+                FreeAnts.ThingsManager.collapseThing($scope.mainThing);
 
                 if (!$scope.searchQuery)
                     return;                

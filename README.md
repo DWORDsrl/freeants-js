@@ -7,10 +7,10 @@ Helpful commands:
 Next steps:
 
             Define class "userInfo"
+
+            Define class "thingPosition"
 			
             Test "usersDataContext.getUsers" call with abort/cancellation		
-			
-            Try to use jQuery in "externals" section of "webpack.config.js"
 			
             Try access with apiKey            
 			
@@ -19,6 +19,10 @@ Next steps:
             Implement NPM support
 			
             In package.json fix ""prepublish": "webpack --debug""
+
+2017-06-22  0.0.9
+
+            Some fix
 
 2017-06-18  0.0.8
 

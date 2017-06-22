@@ -1,12 +1,18 @@
-import {HttpRequestCanceler} from "./helpers";
+import {ItemsRange, HttpRequestCanceler} from "./helpers";
+import {UserInfo} from "./userInfo"
 import {UsersGetParams, UsersRawDataSet, UsersDataContext} from "./usersDataContext"
+
+export interface UsersDataSet {
+    things:  UserInfo[];
+    itemsRange: ItemsRange
+}
 
 export class UsersManager {
     
     private skip : number = 0;
     private usersTotalItemsCount : number = Number.MAX_SAFE_INTEGER;
 
-    public users : any[] = [];
+    public users : UserInfo[] = [];
 
     private usersGetParams : UsersGetParams = {
         filter : "",
@@ -19,13 +25,13 @@ export class UsersManager {
 
     }
 
-    public getUser(userId : any) : Promise<any> {
+    public getUser(userId : string) : Promise<UserInfo> {
             
-        let result : any[] = this.users.filter((user) => { 
+        let result : UserInfo[] = this.users.filter((user) => { 
             return user.id == userId; 
         });
         if (result.length != 0) {
-            return new Promise<any>((resolve, reject) => { 
+            return new Promise<UserInfo>((resolve, reject) => { 
                 resolve(result[0]);
             });
         }
@@ -39,7 +45,7 @@ export class UsersManager {
             self.usersGetParams.skip = self.skip;
 
             return UsersDataContext.getUsers(this.usersGetParams, canceler)
-            .then(function(data) {
+            .then(function(data : UsersRawDataSet) {
 
                 self.usersTotalItemsCount = data.itemsRange.totalItems;
                 self.skip += self.usersGetParams.top;

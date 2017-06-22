@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
 import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
-import {ThingRaw} from "./thingRaw";
+import {ThingRaw} from "./thing";
+import {ThingPositionRaw} from "./thingPosition";
 import * as thingConstants from "./thingConstants";
 
 export interface ThingsGetParams {
@@ -29,9 +30,6 @@ export class ThingsDataContext {
     private static thingsValueUrl(thingId: string) : string { 
         return ThingsDataContext.apiEndPointAddress + "/things/" + thingId + "/value" 
     }
-    private static thingsPositionUrl() : string {
-        return ThingsDataContext.apiEndPointAddress + "/things/position" 
-    }
     private static thingsPositionsUrl() : string {
         return ThingsDataContext.apiEndPointAddress + "/things/positions" 
     }
@@ -48,6 +46,14 @@ export class ThingsDataContext {
         ThingsDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
+    public static getThing(thingId: string) : Promise<ThingRaw> {
+        return axios.get(ThingsDataContext.thingsUrl(thingId), {
+            headers: Helpers.securityHeaders
+        })
+        .then(function(response: any) : ThingRaw {
+            return response.data;
+        })
+    }
     // INFO: To abort call "canceler()"
     public static getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsRawDataSet> {
         var urlRaw = ThingsDataContext.thingsUrl() + "?" +
@@ -83,16 +89,9 @@ export class ThingsDataContext {
                 canceler.reset();
         });
     }
-    public static getThing(thingId: string) : Promise<ThingRaw> {
-        return axios.get(ThingsDataContext.thingsUrl(thingId), {
-            headers: Helpers.securityHeaders
-        })
-        .then(function(response: any) : ThingRaw {
-            return response.data;
-        })
-    }
+    
     // TOCHECK: Check Returned data
-    public static createThing(thingRaw: ThingRaw) : Promise<any> {
+    public static createThing(thingRaw: ThingRaw) : Promise<ThingRaw> {
         return axios.post(ThingsDataContext.thingsUrl(), thingRaw, {
             headers: Helpers.securityHeaders
         })
@@ -101,11 +100,11 @@ export class ThingsDataContext {
         })
     }
     // TOCHECK: Check Returned data
-    public static updateThing(thingId: string, thingRaw: ThingRaw) : Promise<any> {
+    public static updateThing(thingId: string, thingRaw: ThingRaw) : Promise<ThingRaw> {
         return axios.put(ThingsDataContext.thingsUrl(thingId), thingRaw, {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : any {            
+        .then(function(response: any) : ThingRaw {            
             return response.data;
         });
     }
@@ -120,11 +119,11 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static getThingChildrenIds(parentThingId : string) : Promise<any> {
+    public static getThingChildrenIds(parentThingId : string) : Promise<string[]> {
         return axios.get(ThingsDataContext.thingChildrenUrl(parentThingId), {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : any {
+        .then(function(response: any) : string[] {
             return response.data;
         })
     }
@@ -135,7 +134,6 @@ export class ThingsDataContext {
             headers: Helpers.securityHeaders
         })
         .then(function(response: any) : any {
-            
             return response.data;
         })
     }
@@ -167,23 +165,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    // TOCHECK: Is it deprecated?
-    public static putThingPosition(parentThingId: string, childThingId: string, position: number):Promise<any> {
-        return axios.put(ThingsDataContext.thingsPositionUrl(), 
-            JSON.stringify({
-                "parentId": parentThingId, 
-                "childId": childThingId, 
-                "pos": position }), 
-            {
-                headers: Helpers.securityHeaders
-            })
-        .then(function(response: any) : any {            
-            return response.data;
-        })            
-    }
-
-    // TOCHECK: Check Returned data
-    public static putThingsPositions(positions: any[]):Promise<any> {
+    public static putThingsPositions(positions: ThingPositionRaw[]) : Promise<any> {
         return axios.put(ThingsDataContext.thingsPositionsUrl(), 
             positions, 
             {

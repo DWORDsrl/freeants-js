@@ -4,6 +4,7 @@ shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definitio
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
 import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
+import {UserInfoRaw} from "./userInfo"
 
 export interface UsersGetParams {
     filter? : string;
@@ -13,14 +14,14 @@ export interface UsersGetParams {
 }
 
 export interface UsersRawDataSet {
-    users:  any[];
+    users:  UserInfoRaw[];
     itemsRange: ItemsRange
 }
 
 export class UsersDataContext {
     private static apiEndPointAddress : string = "";
 
-    private static usersUrl(userId? : string ) { 
+    private static usersUrl(userId? : string) { 
         return UsersDataContext.apiEndPointAddress + "/users/" + (userId || ""); 
     }
 
@@ -30,11 +31,11 @@ export class UsersDataContext {
         UsersDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
-    public static getUser(userId : string) : Promise<any> {
+    public static getUser(userId : string) : Promise<UserInfoRaw> {
         return axios.get(UsersDataContext.usersUrl(userId), {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : any {
+        .then(function(response: any) : UserInfoRaw {
             return response.data;
         });
     }
@@ -70,20 +71,20 @@ export class UsersDataContext {
                     canceler.reset();
             });
     }
-    public static createUser(userRaw: any) : Promise<any> {
+    public static createUser(userRaw: UserInfoRaw) : Promise<UserInfoRaw> {
         return axios.post(UsersDataContext.usersUrl(), userRaw, {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : any {            
-            return response.data as any;
+        .then(function(response: any) : UserInfoRaw {            
+            return response.data as UserInfoRaw;
         })
     }
     // TOCHECK: Check Returned data
-    public static updateUser(userId: string, thingRaw: any) : Promise<any> {
-        return axios.put(UsersDataContext.usersUrl(userId), thingRaw, {
+    public static updateUser(userId: string, userRaw: UserInfoRaw) : Promise<UserInfoRaw> {
+        return axios.put(UsersDataContext.usersUrl(userId), userRaw, {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : any {            
+        .then(function(response: any) : UserInfoRaw {            
             return response.data;
         });
     }
