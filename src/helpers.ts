@@ -22,6 +22,9 @@ export class HttpRequestCanceler {
     }
 }
 
+// INFO: It is a wrapper for "axios" http call result
+export type HttpFailResult = any;
+
 export class Helpers {
 
     public static get securityHeaders() : any {
@@ -68,3 +71,5 @@ export class Helpers {
         }
     }
 }
+
+

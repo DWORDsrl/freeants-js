@@ -20,6 +20,10 @@ Next steps:
 			
             In package.json fix ""prepublish": "webpack --debug""
 
+2017-06-23  0.0.10
+
+            Implemented basic TypedThingsManager
+
 2017-06-22  0.0.9
 
             Some fix
@@ -61,20 +65,20 @@ Next steps:
             Generated single FreeAnts.d.ts file with DtsBundlePlugin in webpack config file
             Some structural fixes
 
-2017-06-03: No version
+2017-06-03  No version
 
             Implemented logout in AccountManager.
 
-2017-06-02: No version
+2017-06-02  No version
 
             Removed AxiosPromise dependency in AccountDataContext.login
             Implemented native login feature
 
-2017-06-01: No version
+2017-06-01  No version
 
             Added "axios" and "qs" support.
             First successful RestFul call.
 
-2017-05-18: No version
+2017-05-18  No version
 
             Added "jQuery" and aps.net SignalR support

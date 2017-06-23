@@ -2,76 +2,84 @@ import {UserInfo} from "./userInfo";
 import * as thingConstants from "./thingConstants";
 
 export interface ThingRaw {
-    id: string;
-    creationDateTime: Date;
 
-    name:string;
+    id: string
+    creationDateTime: Date
 
-    kind: string;
-    kindTxt: string;
+    name:string
 
-    pos: number;
+    kind: string
+    kindTxt: string
 
-    deletedStatus : thingConstants.ThingDeletedStatus;
+    pos: number
 
-    publicReadClaims : thingConstants.ThingUserReadClaims;
-    publicChangeClaims : thingConstants.ThingUserChangeClaims;
+    deletedStatus : thingConstants.ThingDeletedStatus
 
-    everyoneReadClaims : thingConstants.ThingUserReadClaims;
-    everyoneChangeClaims : thingConstants.ThingUserChangeClaims;
+    publicReadClaims : thingConstants.ThingUserReadClaims
+    publicChangeClaims : thingConstants.ThingUserChangeClaims
 
-    userStatus : thingConstants.ThingUserStatus;
-    userRole : thingConstants.ThingUserRoles;
+    everyoneReadClaims : thingConstants.ThingUserReadClaims
+    everyoneChangeClaims : thingConstants.ThingUserChangeClaims
 
-    userReadClaims: thingConstants.ThingUserReadClaims;
-    userChangeClaims: thingConstants.ThingUserChangeClaims;
+    userStatus : thingConstants.ThingUserStatus
+    userRole : thingConstants.ThingUserRoles
+
+    userReadClaims: thingConstants.ThingUserReadClaims
+    userChangeClaims: thingConstants.ThingUserChangeClaims
+
+    value : string
 
     usersInfos : UserInfo[]
+
 }
+
 export class Thing /*implements ThingRaw*/ {
 
-    public childrenSkip: number = 0;
-    public childrenTotalItems = Number.MAX_SAFE_INTEGER;
+    public childrenSkip: number = 0
+    public childrenTotalItems = Number.MAX_SAFE_INTEGER
 
-    public children : Thing[] = [];
+    public children : Thing[] = []
 
-    public id: string = "";
-    public creationDateTime: Date;
+    public id: string = ""
+    public creationDateTime: Date
 
-    public name:string = "";
+    public name:string = ""
 
-    public kind: string = "";
-    public kindTxt: string;
+    public kind: string = ""
+    public kindTxt: string
 
-    public pos: number = 0;
+    public pos: number = 0
 
-    public deletedStatus : thingConstants.ThingDeletedStatus = thingConstants.ThingDeletedStatus.Ok;
+    public deletedStatus : thingConstants.ThingDeletedStatus = thingConstants.ThingDeletedStatus.Ok
 
-    public deletedDateTime : Date;
+    public deletedDateTime : Date
 
-    public publicReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims;
-    public publicChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims;
+    public publicReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
+    public publicChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
 
-    public everyoneReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims;
-    public everyoneChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims;
+    public everyoneReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
+    public everyoneChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
 
-    public userStatus : thingConstants.ThingUserStatus = thingConstants.ThingUserStatus.Ok;
-    public userRole : thingConstants.ThingUserRoles = thingConstants.ThingUserRoles.User;
+    public userStatus : thingConstants.ThingUserStatus = thingConstants.ThingUserStatus.Ok
+    public userRole : thingConstants.ThingUserRoles = thingConstants.ThingUserRoles.User
 
-    public userReadClaims: thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims;
-    public userChangeClaims: thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims;
+    public userReadClaims: thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
+    public userChangeClaims: thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
 
-    public usersInfos : UserInfo[] = [];
+    public usersInfos : UserInfo[] = []
     
     public value: any = {}
 
     constructor(thingRaw? : ThingRaw) {
-        if (thingRaw)
+        if (thingRaw) {
             Object.assign(this, thingRaw);
+            if (thingRaw.value)
+                this.value = JSON.parse(thingRaw.value)
+        }
     }
 
     public addThingChild(thingChildRaw : ThingRaw) {
-        this.children.unshift(new Thing(thingChildRaw));
+        this.children.unshift(new Thing(thingChildRaw))
     }
 
     public collapse() : void {

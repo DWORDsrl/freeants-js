@@ -10,3 +10,4 @@ export * from "./thing"
 export * from "./thingsUserRightsDataContext";
 export * from "./thingsDataContext";
 export * from "./thingsManager";
+export * from "./typedThingsManager";

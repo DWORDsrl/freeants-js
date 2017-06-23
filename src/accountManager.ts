@@ -1,5 +1,7 @@
 import { shim } from "promise.prototype.finally";
 shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+
+import {HttpFailResult} from "./helpers";
 import {AccountDataContext} from "./accountDataContext";
 
 export class AccountManager {
@@ -119,14 +121,14 @@ export class AccountManager {
         return false;
     }
     
-    public static login(loginData : any, remember: boolean) : Promise<any> {
+    public static login(loginData : any, remember: boolean) : Promise<any | HttpFailResult> {
         return AccountDataContext.login(loginData)
         .then(function(response: any) {
             AccountManager.setLoginData(response, remember);
             return response;
         });
     }  
-    public static async logout() : Promise<any> {
+    public static async logout() : Promise<any  | HttpFailResult> {
         try
         {
             return await AccountDataContext.logout();
@@ -136,7 +138,7 @@ export class AccountManager {
         }
     }
 
-    public static async getLoggedInUserInfo() : Promise<any> {
+    public static async getLoggedInUserInfo() : Promise<any | HttpFailResult> {
         return await AccountDataContext.getUserInfo();
     }    
 }

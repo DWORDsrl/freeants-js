@@ -1,6 +1,6 @@
 import * as qs from "qs"
 import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
-import {Helpers} from "./helpers";
+import {HttpFailResult, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 
 export interface LoginData {
@@ -39,7 +39,7 @@ export class AccountDataContext {
         AccountDataContext.userloginsUrl = AccountDataContext.accountUrl + "/UserLogins";
     }
 
-    public static login(loginData: LoginData) : Promise<any> {
+    public static login(loginData: LoginData) : Promise<any | HttpFailResult> {
         return axios.post(AccountDataContext.loginUrl,qs.stringify(loginData), {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -49,7 +49,7 @@ export class AccountDataContext {
             return response.data;
         });
     }
-    public static logout() : Promise<any> {
+    public static logout() : Promise<any | HttpFailResult> {
         return axios.post(AccountDataContext.logoutUrl, null, {
             headers: Helpers.securityHeaders
         })
@@ -58,7 +58,7 @@ export class AccountDataContext {
         });
     }
     
-    public static getUserInfo() : Promise<any> {
+    public static getUserInfo() : Promise<any | HttpFailResult> {
         return axios.get(AccountDataContext.userInfoUrl, {
             headers: Helpers.securityHeaders
         })

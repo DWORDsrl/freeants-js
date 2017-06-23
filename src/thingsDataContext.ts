@@ -1,18 +1,18 @@
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
-import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
+import {HttpRequestCanceler, HttpFailResult, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 import {ThingRaw} from "./thing";
 import {ThingPositionRaw} from "./thingPosition";
 import * as thingConstants from "./thingConstants";
 
 export interface ThingsGetParams {
-    parentThingId? : string;
-    filter? : string;
-    top? : number;
-    skip? : number;
-    deleteStatus? : thingConstants.ThingDeletedStatus;
-    orderBy? : string;
-    valueFilter? : string
+    parentThingId : string;
+    filter : string;
+    top : number;
+    skip : number;
+    deleteStatus : thingConstants.ThingDeletedStatus;
+    orderBy : string;
+    valueFilter : string
 }
 
 export interface ThingsRawDataSet {
@@ -46,7 +46,7 @@ export class ThingsDataContext {
         ThingsDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
-    public static getThing(thingId: string) : Promise<ThingRaw> {
+    public static getThing(thingId: string) : Promise<ThingRaw | HttpFailResult> {
         return axios.get(ThingsDataContext.thingsUrl(thingId), {
             headers: Helpers.securityHeaders
         })
@@ -54,8 +54,9 @@ export class ThingsDataContext {
             return response.data;
         })
     }
-    // INFO: To abort call "canceler()"
-    public static getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsRawDataSet> {
+    // INFO: To abort call "canceler.cancel()"
+    public static getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsRawDataSet | HttpFailResult> {
+        
         var urlRaw = ThingsDataContext.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
                 (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
@@ -91,16 +92,16 @@ export class ThingsDataContext {
     }
     
     // TOCHECK: Check Returned data
-    public static createThing(thingRaw: ThingRaw) : Promise<ThingRaw> {
+    public static createThing(thingRaw: ThingRaw) : Promise<ThingRaw | HttpFailResult> {
         return axios.post(ThingsDataContext.thingsUrl(), thingRaw, {
             headers: Helpers.securityHeaders
         })
         .then(function(response: any) : ThingRaw {            
-            return response.data as ThingRaw;
+            return response.data;
         })
     }
     // TOCHECK: Check Returned data
-    public static updateThing(thingId: string, thingRaw: ThingRaw) : Promise<ThingRaw> {
+    public static updateThing(thingId: string, thingRaw: ThingRaw) : Promise<ThingRaw | HttpFailResult> {
         return axios.put(ThingsDataContext.thingsUrl(thingId), thingRaw, {
             headers: Helpers.securityHeaders
         })
@@ -109,7 +110,7 @@ export class ThingsDataContext {
         });
     }
     // TOCHECK: Check Returned data
-    public static deleteThing(thingId: string) : Promise<any> {
+    public static deleteThing(thingId: string) : Promise<any | HttpFailResult> {
         return axios.delete(ThingsDataContext.thingsUrl(thingId), {
             headers: Helpers.securityHeaders
         })
@@ -119,7 +120,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static getThingChildrenIds(parentThingId : string) : Promise<string[]> {
+    public static getThingChildrenIds(parentThingId : string) : Promise<string[] | HttpFailResult> {
         return axios.get(ThingsDataContext.thingChildrenUrl(parentThingId), {
             headers: Helpers.securityHeaders
         })
@@ -129,7 +130,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static addChildToParent(parentThingId : string, childThingId : string) : Promise<any> {
+    public static addChildToParent(parentThingId : string, childThingId : string) : Promise<any | HttpFailResult> {
         return axios.post(ThingsDataContext.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
             headers: Helpers.securityHeaders
         })
@@ -138,7 +139,7 @@ export class ThingsDataContext {
         })
     }
     // TOCHECK: Check Returned data
-    public static deleteThingChild(parentThingId : string, childThingId : string) : Promise<any> {
+    public static deleteThingChild(parentThingId : string, childThingId : string) : Promise<any | HttpFailResult> {
         return axios.delete(ThingsDataContext.thingDeleteChildUrl(parentThingId, childThingId), {
             headers: Helpers.securityHeaders
         })
@@ -147,7 +148,7 @@ export class ThingsDataContext {
         })
     }
 
-    public static getThingValue(thingId : string, value: any) : Promise<any> {
+    public static getThingValue(thingId : string, value: any) : Promise<any | HttpFailResult> {
         return axios.get(ThingsDataContext.thingsValueUrl(thingId), {
             headers: Helpers.securityHeaders
         })
@@ -155,7 +156,7 @@ export class ThingsDataContext {
             return response.data;
         })
     }
-    public static putThingValue(thingId : string, value : any): Promise<any> {
+    public static putThingValue(thingId : string, value : any): Promise<any | HttpFailResult> {
         return axios.put(ThingsDataContext.thingsValueUrl(thingId), value, {
             headers: Helpers.securityHeaders
         })
@@ -165,7 +166,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static putThingsPositions(positions: ThingPositionRaw[]) : Promise<any> {
+    public static putThingsPositions(positions: ThingPositionRaw[]) : Promise<any | HttpFailResult> {
         return axios.put(ThingsDataContext.thingsPositionsUrl(), 
             positions, 
             {

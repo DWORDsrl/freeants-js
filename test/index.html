@@ -213,7 +213,9 @@
         FreeAnts.ThingsDataContext.init(endPointAddress);
 
         FreeAnts.AccountManager.appName = "freeants-angular-sample";
-        FreeAnts.AccountManager.readLoginData();        
+        FreeAnts.AccountManager.readLoginData();
+
+        var Notifier =null
 
     </script>
         
@@ -271,12 +273,12 @@
                 $rootScope.lastMsg = "SignalR Subscribe Failed";                
             }
 
-            var notifier = new FreeAnts.SignalRNotifier(endPointAddress.server, 
+            Notifier = new FreeAnts.SignalRNotifier(endPointAddress.server, 
                 "Bearer", getAccessToken, 
                 onConnectionStatusChanged, onReconnected,
                 onSubscribeSuccess, onSubscribeFail);
 
-            notifier.setHook('onCreateThing', function (thing) {
+            Notifier.setHook('onCreateThing', function (thing) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -284,7 +286,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifier.setHook('onDeleteThing', function (thingId) {
+            Notifier.setHook('onDeleteThing', function (thingId) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -292,7 +294,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifier.setHook('onCreateChildThingId', function (parent, child, kind) {
+            Notifier.setHook('onCreateChildThingId', function (parent, child, kind) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -300,7 +302,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifier.setHook('onUpdateThingValue', function (thingId, value) {
+            Notifier.setHook('onUpdateThingValue', function (thingId, value) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -308,7 +310,7 @@
                 //      Togliendolo lo stato di connessione non si aggiorna
                 $timeout(null, 1);
             });
-            notifier.setHook('onDeleteChildThingId', function (parent, child, kind) {
+            Notifier.setHook('onDeleteChildThingId', function (parent, child, kind) {
 
                 //INFO: Inserire qui il codice utile
 
@@ -319,10 +321,10 @@
 
             var _export = {
                 subscribe: function () {
-                    notifier.subscribe();
+                    Notifier.subscribe();
                 },
                 unsubscribe: function () {
-                    notifier.unsubscribe();
+                    Notifier.unsubscribe();
                 }
             }
 
@@ -584,7 +586,7 @@
                 searchCanceler = new FreeAnts.HttpRequestCanceler();
 
                 FreeAnts.ThingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, searchCanceler)
-                .then(function() {
+                .then(function(data) {
                     $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
                     // It's useful for Angular 1 data binding after http calls with no Angular 1 library
                     $timeout(null, 1);
@@ -620,58 +622,57 @@
 
         }]);
 
-        app.factory("BookRightsAndClaims", ['thingClaims',
-        function BookRightsAndClaims(thingClaims) {
-            return {
-                PublicReadClaims: thingClaims.ThingUserChangeClaimsNoClaims,
-                PublicChangeClaims: thingClaims.ThingUserChangeClaimsNoClaims,
-                EveryoneReadClaims: thingClaims.ThingUserReadClaimsNoClaims,
-                EveryoneChangeClaims: thingClaims.ThingUserChangeClaimsNoClaims,
-                // Creator
-                CreatorUserReadClaims: thingClaims.ThingUserReadClaimsAllClaims,
-                //Anche lo User che lo ha costruito non può cambiare il Kind
-                CreatorUserChangeClaims: thingClaims.ThingUserChangeClaimsAllClaims & ~thingClaims.ThingUserChangeClaimsCanChangeKind,
-            }
-        }]);        
-
-        app.factory('BooksManager', ['ThingModel', 'BookRightsAndClaims', 'ApplicationThingsManager',
-        function (ThingModel, BookRightsAndClaims, ApplicationThingsManager) {
+        // INFO: Made by new sdk
+        app.factory('BooksManager', [
+        function () {
         
             function BooksManager(usersManager) {
 
                 var bookKind = "B1996416-43C2-4193-938B-0275C27479AF";
 
-                var mainApp = new ThingModel({ kind: bookKind });
+                var mainApp = new FreeAnts.Thing({ kind: bookKind });
 
-                var applicationThingsManager = new ApplicationThingsManager(mainApp, bookKind, BookRightsAndClaims, usersManager);
+                var BookRightsAndClaims = {
+                    PublicReadClaims: FreeAnts.ThingUserReadClaims.NoClaims,
+                    PublicChangeClaims: FreeAnts.ThingUserChangeClaims.NoClaims,
+                    EveryoneReadClaims: FreeAnts.ThingUserReadClaims.NoClaims,
+                    EveryoneChangeClaims: FreeAnts.ThingUserChangeClaims.NoClaims,
+                    CreatorUserReadClaims: FreeAnts.ThingUserReadClaims.AllClaims,
+                    CreatorUserChangeClaims: FreeAnts.ThingUserChangeClaims.AllClaims & ~FreeAnts.ThingUserChangeClaims.CanChangeKind
+                }
+
+                var bookManager = new FreeAnts.TypedThingsManager(mainApp, bookKind, BookRightsAndClaims, usersManager, Notifier);
                 
-                return applicationThingsManager;
+                return bookManager;
             }
 
             return BooksManager;
         }]);
 
-        // Define the `BooksManagerController` controller
-        app.controller('BooksManagerController', ['$q', '$scope', 'UsersManager', 'BooksManager', 
-        function BooksManagerController($q, $scope, UsersManager, BooksManager) {
+        // INFO: Made by new sdk
+        app.controller('BooksManagerController', ['$scope', 'BooksManager',
+        function BooksManagerController($scope, BooksManager) {
 
-            var usersManager = new UsersManager();
+            var usersManager = new FreeAnts.UsersManager();
 
             var booksManager = new BooksManager(usersManager);
 
-            var abortHttpCalls = $q.defer();
-            
             $scope.books = booksManager.things;
+
+            var canceler = new FreeAnts.HttpRequestCanceler();
             
-            $scope.disableBooksScroll = true;
+            $scope.disableBooksScroll = false;
             $scope.getMoreBooks = function() {
                 if ($scope.disableBooksScroll)
                     return;
                 $scope.disableBooksScroll = true;
-                booksManager.getMoreThings(abortHttpCalls)
+                booksManager.getMoreThings(canceler)
                 .then(function(data) {
                     $scope.disableBooksScroll = (booksManager.getThingsTotalItems() == $scope.books.length);                    
-                });
+                })
+                .catch(function(response) {
+                    alert(response)
+                })
             }           
         }]);
                 

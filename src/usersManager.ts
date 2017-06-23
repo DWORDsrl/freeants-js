@@ -1,4 +1,4 @@
-import {ItemsRange, HttpRequestCanceler} from "./helpers";
+import {ItemsRange, HttpFailResult, HttpRequestCanceler} from "./helpers";
 import {UserInfo} from "./userInfo"
 import {UsersGetParams, UsersRawDataSet, UsersDataContext} from "./usersDataContext"
 
@@ -25,7 +25,7 @@ export class UsersManager {
 
     }
 
-    public getUser(userId : string) : Promise<UserInfo> {
+    public getUser(userId : string) : Promise<UserInfo | HttpFailResult> {
             
         let result : UserInfo[] = this.users.filter((user) => { 
             return user.id == userId; 
@@ -38,7 +38,7 @@ export class UsersManager {
         return UsersDataContext.getUser(userId);
     }
 
-    public getMoreUsers(canceler?: HttpRequestCanceler) : Promise<UsersRawDataSet> {
+    public getMoreUsers(canceler?: HttpRequestCanceler) : Promise<UsersRawDataSet | HttpFailResult> {
 
             var self = this;
 

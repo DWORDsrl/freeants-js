@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
-import {Helpers} from "./helpers";
+import {HttpFailResult, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 import {ThingUserRightsRaw} from "./thingUserRights";
 
@@ -24,7 +24,7 @@ export class ThingsUserRightsDataContext {
         ThingsUserRightsDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
-    public static getThingUsersRights(parameter : ThingsUserRightsParams) : Promise<ThingUserRightsRaw[]> {
+    public static getThingUsersRights(parameter : ThingsUserRightsParams) : Promise<ThingUserRightsRaw[] | HttpFailResult> {
 
         let url : string = ThingsUserRightsDataContext.thingsUserRoleStatusUrl(parameter.thingId) + "?" +
                     (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
@@ -39,7 +39,7 @@ export class ThingsUserRightsDataContext {
             return response.data;
         })
     }
-    public static createThingUserRights(thingId : string, thingUserRights : ThingUserRightsRaw) : Promise<ThingUserRightsRaw> {
+    public static createThingUserRights(thingId : string, thingUserRights : ThingUserRightsRaw) : Promise<ThingUserRightsRaw | HttpFailResult> {
 
         return axios.post(ThingsUserRightsDataContext.thingsUserRoleStatusUrl(thingId), thingUserRights, {
             headers: Helpers.securityHeaders
@@ -48,7 +48,7 @@ export class ThingsUserRightsDataContext {
             return response.data as ThingUserRightsRaw;
         })
     }  
-    public static updateThingUserRights(thingId : string, userId : string, thingUserRights : ThingUserRightsRaw) : Promise<ThingUserRightsRaw> {
+    public static updateThingUserRights(thingId : string, userId : string, thingUserRights : ThingUserRightsRaw) : Promise<ThingUserRightsRaw | HttpFailResult> {
         return axios.put(ThingsUserRightsDataContext.thingsUserRoleStatusUrl(thingId, userId), thingUserRights, {
             headers: Helpers.securityHeaders
         })
@@ -56,7 +56,7 @@ export class ThingsUserRightsDataContext {
             return response.data;
         });
     }
-    public static deleteThingUserRights(thingId : string, userId : string) : Promise<any> {
+    public static deleteThingUserRights(thingId : string, userId : string) : Promise<any | HttpFailResult> {
         return axios.delete(ThingsUserRightsDataContext.thingsUserRoleStatusUrl(thingId, userId), {
             headers: Helpers.securityHeaders
         })

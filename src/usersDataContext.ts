@@ -2,7 +2,7 @@ import { shim } from "promise.prototype.finally";
 shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
 
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
-import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
+import { HttpFailResult, HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 import {UserInfoRaw} from "./userInfo"
 
@@ -31,7 +31,7 @@ export class UsersDataContext {
         UsersDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
-    public static getUser(userId : string) : Promise<UserInfoRaw> {
+    public static getUser(userId : string) : Promise<any | HttpFailResult> {
         return axios.get(UsersDataContext.usersUrl(userId), {
             headers: Helpers.securityHeaders
         })
@@ -39,7 +39,7 @@ export class UsersDataContext {
             return response.data;
         });
     }
-    public static getUsers(parameter : UsersGetParams, canceler? : HttpRequestCanceler) : Promise<UsersRawDataSet> {
+    public static getUsers(parameter : UsersGetParams, canceler? : HttpRequestCanceler) : Promise<any | HttpFailResult> {
         
         let urlRaw : string = UsersDataContext.usersUrl() + "?" +
                 (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
@@ -71,7 +71,7 @@ export class UsersDataContext {
                     canceler.reset();
             });
     }
-    public static createUser(userRaw: UserInfoRaw) : Promise<UserInfoRaw> {
+    public static createUser(userRaw: UserInfoRaw) : Promise<any | HttpFailResult> {
         return axios.post(UsersDataContext.usersUrl(), userRaw, {
             headers: Helpers.securityHeaders
         })
@@ -80,7 +80,7 @@ export class UsersDataContext {
         })
     }
     // TOCHECK: Check Returned data
-    public static updateUser(userId: string, userRaw: UserInfoRaw) : Promise<UserInfoRaw> {
+    public static updateUser(userId: string, userRaw: UserInfoRaw) : Promise<any | HttpFailResult> {
         return axios.put(UsersDataContext.usersUrl(userId), userRaw, {
             headers: Helpers.securityHeaders
         })
@@ -89,7 +89,7 @@ export class UsersDataContext {
         });
     }
     // TOCHECK: Check Returned data
-    public static deleteUser(userId: string) : Promise<any> {
+    public static deleteUser(userId: string) : Promise<any | HttpFailResult> {
         return axios.delete(UsersDataContext.usersUrl(userId), {
             headers: Helpers.securityHeaders
         })
