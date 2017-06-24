@@ -1,3 +1,4 @@
+import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
 import {AccountManager} from "./accountManager"
 
 export interface ItemsRange {
@@ -8,15 +9,28 @@ export interface ItemsRange {
 
 // INFO: It is a wrapper for "axios" to abort Http calls
 export class HttpRequestCanceler {
+
     public cancelerToken : any = null;
     public executor : any = null;
 
+    public setup() {
+
+        if (this.cancelerToken === null) {
+            this.cancelerToken = new axios.CancelToken((c) : void => {
+                this.executor = c
+            });
+        }
+    }
+
+    // INFO:    Maybe not useful
     public reset() : void {
+
         this.executor = null;
         this.cancelerToken = null;
     }
     public cancel() : void {
-        if (this.executor != null)
+
+        if (this.executor)
             this.executor();
         this.reset();
     }

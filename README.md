@@ -20,6 +20,10 @@ Next steps:
 			
             In package.json fix ""prepublish": "webpack --debug""
 
+2017-06-24  0.0.11
+
+            Some fix
+
 2017-06-23  0.0.10
 
             Implemented basic TypedThingsManager

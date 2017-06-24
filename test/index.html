@@ -567,14 +567,13 @@
                 valueFilter: null
             };
 
-            var searchCanceler = null;
+            let searchCanceler = new FreeAnts.HttpRequestCanceler();
 
             $scope.searchThing = function() {
                 
                 $scope.disableThingsScroll = true;
 
-                if (searchCanceler)
-                    searchCanceler.cancel();
+                searchCanceler.cancel();
 
                 FreeAnts.ThingsManager.collapseThing($scope.mainThing);
 
@@ -582,9 +581,7 @@
                     return;                
 
                 getThingsParams.filter = "contains(Name,'" + $scope.searchQuery + "') or contains(Id,'" + $scope.searchQuery + "') or contains(Kind,'" + $scope.searchQuery + "')";
-
-                searchCanceler = new FreeAnts.HttpRequestCanceler();
-
+                
                 FreeAnts.ThingsManager.getMoreThingChildren($scope.mainThing, getThingsParams, searchCanceler)
                 .then(function(data) {
                     $scope.disableThingsScroll = ($scope.mainThing.childrenTotalItems == $scope.mainThing.children.length);
@@ -595,10 +592,10 @@
                 });
             }
 
-            var moreThingsCanceler = new FreeAnts.HttpRequestCanceler();
+            let moreThingsCanceler = new FreeAnts.HttpRequestCanceler();
 
-            $scope.disableThingsScroll = false;              
-            $scope.getMoreThings = function() {
+            $scope.disableThingsScroll = false;      
+            $scope.getMoreThings = function() {                
 
                 moreThingsCanceler.cancel();
 
@@ -612,7 +609,7 @@
                     // It's useful for Angular 1 data binding after http calls with no Angular 1 library
                     $timeout(null, 1);
                 }, function(data) {
-
+                    $scope.disableThingsScroll = false;
                 });
             }
 
@@ -650,28 +647,35 @@
         }]);
 
         // INFO: Made by new sdk
-        app.controller('BooksManagerController', ['$scope', 'BooksManager',
-        function BooksManagerController($scope, BooksManager) {
+        app.controller('BooksManagerController', ['$timeout', '$scope', 'BooksManager',
+        function BooksManagerController($timeout, $scope, BooksManager) {
 
-            var usersManager = new FreeAnts.UsersManager();
+            let usersManager = new FreeAnts.UsersManager();
 
-            var booksManager = new BooksManager(usersManager);
+            let booksManager = new BooksManager(usersManager);
 
             $scope.books = booksManager.things;
 
-            var canceler = new FreeAnts.HttpRequestCanceler();
+            let canceler = new FreeAnts.HttpRequestCanceler();
             
             $scope.disableBooksScroll = false;
             $scope.getMoreBooks = function() {
+
+                canceler.cancel();
+
                 if ($scope.disableBooksScroll)
                     return;
+
                 $scope.disableBooksScroll = true;
                 booksManager.getMoreThings(canceler)
                 .then(function(data) {
-                    $scope.disableBooksScroll = (booksManager.getThingsTotalItems() == $scope.books.length);                    
+                    $scope.disableBooksScroll = (booksManager.getThingsTotalItems() == $scope.books.length);
+                    $timeout(null, 1);
                 })
                 .catch(function(response) {
-                    alert(response)
+                    console.log("ccccccc")
+                    $scope.disableBooksScroll = false
+                    $timeout(null, 1);
                 })
             }           
         }]);

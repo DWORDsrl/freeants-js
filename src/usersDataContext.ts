@@ -46,16 +46,10 @@ export class UsersDataContext {
                 (!!parameter.top ? ("&$top=" + parameter.top) : "") +
                 (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
                 (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "");
-        
-        if (canceler != undefined) {            
-            if (canceler.cancelerToken == null) {
-                var CancelToken = axios.CancelToken;
-                canceler.cancelerToken = new CancelToken(function executor(c) {
-                    canceler.executor = c;
-                });
-            }
-        }
-        
+
+        if (canceler)
+            canceler.setup();
+
         return axios.get(urlRaw, {
                 headers: Helpers.securityHeaders,
                 cancelToken: (canceler != undefined) ? canceler.cancelerToken : null
@@ -67,8 +61,10 @@ export class UsersDataContext {
                 };
             })
             .finally(function() {
-                if (canceler != undefined)
+                /*
+                if (canceler)
                     canceler.reset();
+                */
             });
     }
     public static createUser(userRaw: UserInfoRaw) : Promise<any | HttpFailResult> {

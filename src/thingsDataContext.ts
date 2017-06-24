@@ -66,18 +66,12 @@ export class ThingsDataContext {
                 (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "") +
                 (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "");
 
-        if (canceler != undefined) {            
-            if (canceler.cancelerToken == null) {
-                var CancelToken = axios.CancelToken;
-                canceler.cancelerToken = new CancelToken(function executor(c) {
-                    canceler.executor = c;
-                });
-            }
-        }
-        
+        if (canceler)
+            canceler.setup();
+
         return axios.get(urlRaw, {
                 headers: Helpers.securityHeaders,
-                cancelToken: (canceler != undefined) ? canceler.cancelerToken : null
+                cancelToken: (canceler) ? canceler.cancelerToken : null
             })
         .then(function(response: any) : ThingsRawDataSet {
             return {
@@ -86,8 +80,10 @@ export class ThingsDataContext {
             }
         })
         .finally(function() {
-            if (canceler != undefined)
+            /*
+            if (canceler)
                 canceler.reset();
+            */
         });
     }
     

@@ -11,18 +11,34 @@ export interface ThingsDataSet {
 export class ThingsManager {
 
     // ThingDataContext Proxy section
+    //
     public static async getThing(thingId : string) : Promise<Thing | HttpFailResult> {
-        let thingRaw : ThingRaw = await ThingsDataContext.getThing(thingId);
+
+        let thingRaw : ThingRaw = null
+        try {
+            thingRaw = await ThingsDataContext.getThing(thingId)
+        }
+        catch(response){
+            throw response
+        }
         return thingRaw ? new Thing(thingRaw) : null;
     }
     public static async getThings(parameter: ThingsGetParams , canceler: HttpRequestCanceler) : Promise<ThingsDataSet | HttpFailResult> {
 
-        let thingsRawDataSet : ThingsRawDataSet = await ThingsDataContext.getThings(parameter, canceler);
+        let thingsRawDataSet : ThingsRawDataSet = null
+        let things : Thing[] = []
+        
+        try {
 
-        let things : Thing[] = [];
-        for (let i = 0; i < thingsRawDataSet.things.length; i++) {
-            var thing = new Thing(thingsRawDataSet.things[i]);
-            things.push(thing);
+            thingsRawDataSet = await ThingsDataContext.getThings(parameter, canceler);
+            
+            for (let i = 0; i < thingsRawDataSet.things.length; i++) {
+                var thing = new Thing(thingsRawDataSet.things[i])
+                things.push(thing)
+            }
+        }
+        catch(response) {
+            throw response as HttpFailResult
         }
 
         return {
@@ -39,7 +55,17 @@ export class ThingsManager {
         .then(function (thingRaw) : Thing {
             return new Thing(thingRaw);
         });
-    }  
+    }
+    public updateThing(thing : Thing) : Promise<Thing | HttpFailResult> {
+
+        let thingRaw : ThingRaw;
+        Object.assign(thingRaw, thing);
+
+        return ThingsDataContext.updateThing(thing.id, thingRaw)
+        .then(function (thingRaw) : Thing {
+            return new Thing(thingRaw);
+        });
+    }
     public static deleteThing(thingId : string, recursive : boolean) : Promise<any | HttpFailResult> {
         if (recursive) {
             return ThingsManager.deleteThingChildren(thingId, recursive)
@@ -91,6 +117,7 @@ export class ThingsManager {
     }
 
     // Thing Proxy section
+    //
     public static addThingChild(thing : Thing, thingChildRaw : ThingRaw) : void {
         thing.addThingChild(thingChildRaw);
     }

@@ -127,11 +127,15 @@ export class TypedThingsManager {
 
     }
 
+    // INFO:    "thing.children " is fills filtered by "this.getChindrenThingsParams"
     private getMoreThingChildren(thing : Thing, canceler : HttpRequestCanceler) : Promise<ThingsDataSet | HttpFailResult> {
         return ThingsManager.getMoreThingChildren(thing, this.getChindrenThingsParams, canceler)
     }
 
-    public getMoreThings = (canceler : HttpRequestCanceler) : Promise<any  | HttpFailResult> => {
+    // INFO:    In Books example where "this.mainThing" in a "root thing" 
+    //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
+    //          and "this.mainThing.children[0..n].children" with "things" collection like "book comments"
+    public getMoreThings = (canceler : HttpRequestCanceler) : Promise<any | HttpFailResult> => {
         
         let self = this;
 
